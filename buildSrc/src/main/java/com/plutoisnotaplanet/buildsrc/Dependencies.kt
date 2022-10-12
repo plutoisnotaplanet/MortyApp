@@ -24,18 +24,21 @@ object Dependencies {
     }
 
     object Network {
-        private const val sandwichVersion = "1.2.1"
         private const val okhttpVersion = "4.7.2"
         private const val retrofitVersion = "2.9.0"
-        const val sandwich = "com.github.skydoves:sandwich:$sandwichVersion"
+        const val okhttp = "com.squareup.okhttp3:okhttp:$okhttpVersion"
+        const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
         const val logInterceptor = "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
-        const val gson = "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+        const val gsonConverter = "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+        const val gson = "com.google.code.gson:gson:$retrofitVersion"
         const val mock = "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
     }
 
     object Coil {
         private const val version = "1.3.2"
+        private const val landscapistVersion = "1.2.0"
         const val sdk = "io.coil-kt:coil-compose:$version"
+        const val landscapist = "com.github.skydoves:landscapist-coil:${landscapistVersion}"
     }
 
 
@@ -67,17 +70,19 @@ object Dependencies {
         const val tooling = "androidx.ui:ui-tooling:1.0.0-alpha07"
 
         object Lifecycle {
-            private const val lifecycleVersion = ""
-            implementation "androidx.lifecycle:lifecycle-extensions:$versions.lifecycleVersion"
-            implementation "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycleVersion"
-            implementation "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycleVersion"
-            implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycleVersion"
+            private const val lifecycleVersion = "2.5.1"
+            const val extensions = "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
+            const val runtime = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
+            const val liveData = "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
+            const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
         }
 
         object Compose {
             const val snapshot = ""
             const val version = "1.0.2"
             const val activityComposeVersion = "1.3.0-alpha06"
+            private const val accompanistVersion = "0.25.1"
+            private const val orchestraVersion = "1.1.1"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val compiler = "androidx.compose.compiler:compiler:$version"
@@ -88,6 +93,10 @@ object Dependencies {
             const val material = "androidx.compose.material:material:${version}"
             const val animation = "androidx.compose.animation:animation:${version}"
             const val activity = "androidx.activity:activity-compose:${activityComposeVersion}"
+
+            const val accompanistInsets  ="com.google.accompanist:accompanist-insets:$accompanistVersion"
+            const val accompanistFlow = "com.google.accompanist:accompanist-flowlayout:$accompanistVersion"
+            const val orchestra = "com.github.skydoves:orchestra-balloon:$orchestraVersion"
         }
 
         object Test {

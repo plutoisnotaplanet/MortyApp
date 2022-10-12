@@ -74,11 +74,31 @@ dependencies {
     implementation (Dependencies.AndroidX.Compose.tooling)
     implementation (Dependencies.AndroidX.Compose.activity)
 
+    implementation (Dependencies.AndroidX.Compose.accompanistInsets)
+    implementation (Dependencies.AndroidX.Compose.accompanistFlow)
+    implementation (Dependencies.AndroidX.Compose.orchestra)
+
+    //image loading
+    implementation (Dependencies.Coil.landscapist)
+
     // network
-    implementation (Dependencies.Network.sandwich)
-    implementation (Dependencies.Network.logInterceptor)
+    implementation (Dependencies.Network.retrofit)
     implementation (Dependencies.Network.gson)
+    implementation (Dependencies.Network.okhttp)
+    implementation (Dependencies.Network.logInterceptor)
+    implementation (Dependencies.Network.gsonConverter)
     testImplementation (Dependencies.Network.mock)
+
+    //room
+    implementation (Dependencies.Database.runtime)
+    implementation (Dependencies.Database.ktx)
+    kapt (Dependencies.Database.compiler)
+
+    //lifecycle
+    implementation (Dependencies.AndroidX.Lifecycle.extensions)
+    implementation (Dependencies.AndroidX.Lifecycle.runtime)
+    implementation (Dependencies.AndroidX.Lifecycle.liveData)
+    implementation (Dependencies.AndroidX.Lifecycle.viewModel)
 
     // coroutines
     implementation (Dependencies.Coroutines.core)
