@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    compileSdk = 32
+    compileSdk = 33
 
     defaultConfig {
         applicationId =  "com.plutoisnotaplanet.mortyapp"
         minSdk = 24
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 1
         versionName  = "1.0"
 
@@ -95,7 +95,6 @@ dependencies {
     kapt (Dependencies.Database.compiler)
 
     //lifecycle
-    implementation (Dependencies.AndroidX.Lifecycle.extensions)
     implementation (Dependencies.AndroidX.Lifecycle.runtime)
     implementation (Dependencies.AndroidX.Lifecycle.liveData)
     implementation (Dependencies.AndroidX.Lifecycle.viewModel)

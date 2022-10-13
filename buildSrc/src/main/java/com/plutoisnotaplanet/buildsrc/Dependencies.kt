@@ -1,7 +1,7 @@
 package com.plutoisnotaplanet.buildsrc
 
 object Dependencies {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.1"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.3.0"
     const val junit = "junit:junit:4.13"
 
     const val exoplayer = "com.google.android.exoplayer:exoplayer:2.11.8"
@@ -78,14 +78,15 @@ object Dependencies {
         }
 
         object Compose {
-            const val snapshot = ""
-            const val version = "1.0.2"
-            const val activityComposeVersion = "1.3.0-alpha06"
+            const val version = "1.2.1"
+
+            private const val compilerVersion = "1.3.2"
+            const val activityComposeVersion = "1.6.0"
             private const val accompanistVersion = "0.25.1"
             private const val orchestraVersion = "1.1.1"
 
             const val runtime = "androidx.compose.runtime:runtime:$version"
-            const val compiler = "androidx.compose.compiler:compiler:$version"
+            const val compiler = "androidx.compose.compiler:compiler:$compilerVersion"
             const val foundation = "androidx.compose.foundation:foundation:${version}"
             const val layout = "androidx.compose.foundation:foundation-layout:${version}"
             const val ui = "androidx.compose.ui:ui:${version}"
