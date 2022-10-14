@@ -36,9 +36,12 @@ object Dependencies {
 
     object Coil {
         private const val version = "1.3.2"
-        private const val landscapistVersion = "1.2.0"
+        private const val landscapistVersion = "1.4.3"
+        private const val coilVersion = "2.2.2"
         const val sdk = "io.coil-kt:coil-compose:$version"
         const val landscapist = "com.github.skydoves:landscapist-coil:${landscapistVersion}"
+
+        const val coil = "io.coil-kt:coil-compose:$coilVersion"
     }
 
 
@@ -50,7 +53,7 @@ object Dependencies {
     }
 
     object Kotlin {
-        private const val version = "1.5.21"
+        private const val version = "1.7.20"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -64,9 +67,9 @@ object Dependencies {
     }
 
     object AndroidX {
-        const val appcompat = "androidx.appcompat:appcompat:1.3.0-alpha01"
-        const val coreKtx = "androidx.core:core-ktx:1.5.0-alpha02"
-        const val material = "com.google.android.material:material:1.2.0"
+        const val appcompat = "androidx.appcompat:appcompat:1.5.1"
+        const val coreKtx = "androidx.core:core-ktx:1.9.0"
+        const val material = "com.google.android.material:material:1.6.1"
         const val tooling = "androidx.ui:ui-tooling:1.0.0-alpha07"
 
         object Lifecycle {
@@ -80,11 +83,14 @@ object Dependencies {
         object Compose {
             const val version = "1.2.1"
 
-            private const val compilerVersion = "1.3.2"
+            const val compilerVersion = "1.3.2"
             const val activityComposeVersion = "1.6.0"
             private const val accompanistVersion = "0.25.1"
             private const val orchestraVersion = "1.1.1"
+            private const val navigationComposeVersion = "2.5.1"
+            private const val constraintVersion = "1.0.1"
 
+            const val navigationCompose =  "androidx.navigation:navigation-compose:$navigationComposeVersion"
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val compiler = "androidx.compose.compiler:compiler:$compilerVersion"
             const val foundation = "androidx.compose.foundation:foundation:${version}"
@@ -94,6 +100,7 @@ object Dependencies {
             const val material = "androidx.compose.material:material:${version}"
             const val animation = "androidx.compose.animation:animation:${version}"
             const val activity = "androidx.activity:activity-compose:${activityComposeVersion}"
+            const val constraint = "androidx.constraintlayout:constraintlayout-compose:$constraintVersion"
 
             const val accompanistInsets  ="com.google.accompanist:accompanist-insets:$accompanistVersion"
             const val accompanistFlow = "com.google.accompanist:accompanist-flowlayout:$accompanistVersion"
@@ -101,7 +108,7 @@ object Dependencies {
         }
 
         object Test {
-            private const val version = "1.2.0"
+            private const val version = "1.4.0"
             const val core = "androidx.test:core:$version"
             const val rules = "androidx.test:rules:$version"
 

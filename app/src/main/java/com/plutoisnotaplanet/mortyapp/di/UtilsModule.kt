@@ -16,11 +16,4 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object UtilsModule {
 
-    @Provides
-    @Singleton
-    fun provideNetworkConnectivityObserver(
-        @ApplicationContext context: Context,
-    ): ConnectivityObserver {
-        return NetworkConnectivityObserver(context)
-    }
 }

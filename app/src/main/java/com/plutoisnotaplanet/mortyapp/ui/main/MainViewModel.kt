@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import coil.ImageLoader
 import dagger.hilt.android.lifecycle.HiltViewModel
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,11 +15,4 @@ class MainViewModel @Inject constructor(
 
     ): ViewModel() {
 
-    private val _selectedTab: MutableState<MainScreenHomeTab> =
-        mutableStateOf(MainScreenHomeTab.CHARACTERS)
-    val selectedTab: State<MainScreenHomeTab> get() = _selectedTab
-
-    fun selectTab(tab: MainScreenHomeTab) {
-        _selectedTab.value = tab
-    }
 }

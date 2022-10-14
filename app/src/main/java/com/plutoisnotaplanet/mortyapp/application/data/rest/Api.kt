@@ -6,25 +6,33 @@ import com.plutoisnotaplanet.mortyapp.application.data.rest.response.EpisodeDto
 import com.plutoisnotaplanet.mortyapp.application.data.rest.response.LocationDto
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 interface Api {
 
-    @GET("/character/?page={page_id}")
-    fun fetchCharacters(@Path("page_id") id: Long): BaseResponseDto<CharacterDto>
+    @GET("character/")
+    suspend fun fetchCharacters(@Query("page") page: Int): BaseResponseDto<CharacterDto>
 
-    @GET("/character/{character_id}")
-    fun fetchCharacter(@Path("character_id") id: Long): CharacterDto
+    @GET("character/")
+    suspend fun fetchFilteredCharacters(
+        @QueryMap map: Map<String, String>
+    ): BaseResponseDto<CharacterDto>
 
-    @GET("/location/?page={page_id}")
-    fun fetchLocations(@Path("page_id") id: Long): BaseResponseDto<LocationDto>
 
-    @GET("/location/{location_id}")
-    fun fetchLocation(@Path("location_id") id: Long): LocationDto
+    @GET("character/{character_id}")
+    suspend fun fetchCharacter(@Path("character_id") id: Long): CharacterDto
 
-    @GET("/episode/?page={page_id}")
-    fun fetchEpisodes(@Path("page_id") id: Long): BaseResponseDto<EpisodeDto>
+    @GET("location/")
+    suspend fun fetchLocations(@Query("page") page: Long): BaseResponseDto<LocationDto>
 
-    @GET("/location/{episode_id}")
-    fun fetchEpisode(@Path("episode_id") id: Long): EpisodeDto
+    @GET("location/{location_id}")
+    suspend fun fetchLocation(@Path("location_id") id: Long): LocationDto
+
+    @GET("episode/")
+    suspend fun fetchEpisodes(@Query("page") page: Long): BaseResponseDto<EpisodeDto>
+
+    @GET("episode/{episode_id}")
+    suspend fun fetchEpisode(@Path("episode_id") id: Long): EpisodeDto
 
 }

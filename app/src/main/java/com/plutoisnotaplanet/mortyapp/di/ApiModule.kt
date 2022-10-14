@@ -21,6 +21,16 @@ object ApiModule {
 
     @Provides
     @Singleton
+    fun provideOkHttpClient(
+        connectivityObserver: ConnectivityObserver
+    ): OkHttpClient {
+        return ApiFactory.createOkHttpClient(
+            connectivityObserver
+        )
+    }
+
+    @Provides
+    @Singleton
     fun provideImageLoader(
         @ApplicationContext context: Context,
         okHttpClient: OkHttpClient
@@ -41,10 +51,10 @@ object ApiModule {
     @Provides
     @Singleton
     fun provideApi(
-        connectivityObserver: ConnectivityObserver,
+        okHttpClient: OkHttpClient
     ): Api =
-        ApiFactory().create(
+        ApiFactory.create(
             Constants.BASE_URL,
-            connectivityObserver
+            okHttpClient
         )
 }

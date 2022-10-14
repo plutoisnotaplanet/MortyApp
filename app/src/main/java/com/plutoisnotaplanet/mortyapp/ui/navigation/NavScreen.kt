@@ -7,6 +7,10 @@ sealed class NavScreen(val route: String) {
 
     object Home : NavScreen("Home")
 
+    object Locations: NavScreen("Locations")
+    object Characters: NavScreen("Characters")
+    object Episodes: NavScreen("Episodes")
+
     object CharacterDetails : NavScreen("CharacterDetails") {
 
         const val routeWithArgument: String = "CharacterDetails/{characterId}"

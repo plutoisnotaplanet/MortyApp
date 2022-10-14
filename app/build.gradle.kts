@@ -45,7 +45,7 @@ android {
         shaders = false
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = Dependencies.AndroidX.Compose.version
+        kotlinCompilerExtensionVersion = Dependencies.AndroidX.Compose.compilerVersion
     }
     packagingOptions {
         resources {
@@ -73,6 +73,8 @@ dependencies {
     implementation (Dependencies.AndroidX.Compose.animation)
     implementation (Dependencies.AndroidX.Compose.tooling)
     implementation (Dependencies.AndroidX.Compose.activity)
+    implementation (Dependencies.AndroidX.Compose.navigationCompose)
+    implementation (Dependencies.AndroidX.Compose.constraint)
 
     implementation (Dependencies.AndroidX.Compose.accompanistInsets)
     implementation (Dependencies.AndroidX.Compose.accompanistFlow)

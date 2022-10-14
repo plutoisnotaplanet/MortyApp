@@ -12,21 +12,29 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-class ApiFactory {
+object ApiFactory {
 
-    fun create(
-        baseUrl: String,
+    fun createOkHttpClient(
         connectivityObserver: ConnectivityObserver
-    ): Api {
-        val gson: Gson = createGson()
-
+    ): OkHttpClient {
         val httpLoggingInterceptor: HttpLoggingInterceptor = createHttpLoggingInterceptor()
-        val responseInterceptor: ResponseInterceptor = createResponseInterceptor(connectivityObserver)
+        val responseInterceptor: ResponseInterceptor =
+            createResponseInterceptor(connectivityObserver)
 
         val okHttpClient: OkHttpClient = createOkHttpClient(
             httpLoggingInterceptor,
             responseInterceptor
         )
+
+        return okHttpClient
+    }
+
+    fun create(
+        baseUrl: String,
+        okHttpClient: OkHttpClient
+    ): Api {
+        val gson: Gson = createGson()
+
         return createRetrofit(okHttpClient, gson)
             .baseUrl(baseUrl)
             .build()
@@ -53,7 +61,7 @@ class ApiFactory {
 
     private fun createHttpLoggingInterceptor(): HttpLoggingInterceptor =
         HttpLoggingInterceptor().setLevel(
-            if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+            HttpLoggingInterceptor.Level.BODY
         )
 
     private fun createGson(): Gson = GsonBuilder().setLenient().create()
