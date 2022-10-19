@@ -1,14 +1,15 @@
 package com.plutoisnotaplanet.mortyapp.application.data.repository_impl
 
 import com.plutoisnotaplanet.mortyapp.application.data.rest.Api
+import com.plutoisnotaplanet.mortyapp.application.domain.model.BaseResponse
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Character
+import com.plutoisnotaplanet.mortyapp.application.domain.model.NetworkResponse
 import com.plutoisnotaplanet.mortyapp.application.domain.repository.CharactersRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
-import timber.log.Timber
 import javax.inject.Inject
 
 class CharactersRepositoryImpl @Inject constructor(
@@ -43,29 +44,24 @@ class CharactersRepositoryImpl @Inject constructor(
     }
 
     override fun loadCharacter(
-        characterId: Long,
-        onSuccess: () -> Unit,
-        onError: (String?) -> Unit
-    ): Flow<Character> {
+        characterId: Long
+    ): Flow<NetworkResponse<Character>> {
         return flow {
 
             try {
                 val response = api.fetchCharacter(characterId)
 
-                emit(response.toModel())
+                emit(NetworkResponse.Success(response.toModel()))
             } catch (e: Exception) {
-                onError(e.message)
+                emit(NetworkResponse.Error(e.message))
             }
         }
-            .onCompletion { onSuccess() }
             .flowOn(Dispatchers.IO)
     }
 
     override fun loadFilteredCharacters(
-        map: Map<String,String>,
-        onSuccess: () -> Unit,
-        onError: (String?) -> Unit
-    ): Flow<List<Character>> {
+        map: Map<String, String>,
+    ): Flow<NetworkResponse<BaseResponse<Character>>> {
         return flow {
 
             try {
@@ -75,15 +71,18 @@ class CharactersRepositoryImpl @Inject constructor(
                 val charactersListDto = response.results
 
                 emit(
-                    charactersListDto.map { dto ->
-                        dto.toModel()
-                    }
+                    NetworkResponse.Success(
+                        response.toModel(
+                            charactersListDto.map { dto ->
+                                dto.toModel()
+                            }
+                        )
+                    )
                 )
             } catch (e: Exception) {
-                onError(e.message)
+                emit(NetworkResponse.Error(e.message))
             }
         }
-            .onCompletion { onSuccess() }
             .flowOn(Dispatchers.IO)
     }
 }

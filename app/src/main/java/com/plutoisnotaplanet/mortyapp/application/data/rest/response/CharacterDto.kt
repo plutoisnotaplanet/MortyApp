@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 import com.plutoisnotaplanet.mortyapp.application.ApiConstants
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Character
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterGender
+import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterSpecies
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStatus
 import com.plutoisnotaplanet.mortyapp.application.extensions.Extensions.toUiFormat
 import java.util.*
@@ -40,7 +41,7 @@ data class CharacterDto(
             id ?: 0,
             name,
             status.toCharacterStatus(),
-            species,
+            species.toCharacterSpecie(),
             type,
             gender.toCharacterGender(),
             origin?.toModel(),
@@ -52,20 +53,15 @@ data class CharacterDto(
         )
     }
 
+    private fun String?.toCharacterSpecie(): CharacterSpecies {
+        return CharacterSpecies.values().first { it.apiValue == this }
+    }
+
     private fun String?.toCharacterStatus(): CharacterStatus {
-        return when (this) {
-            ApiConstants.Alive -> CharacterStatus.Alive
-            ApiConstants.Dead -> CharacterStatus.Dead
-            else -> CharacterStatus.Unknown
-        }
+        return CharacterStatus.values().first { it.apiValue == this }
     }
 
     private fun String?.toCharacterGender(): CharacterGender {
-        return when (this) {
-            ApiConstants.Female -> CharacterGender.Female
-            ApiConstants.Male -> CharacterGender.Male
-            ApiConstants.Genderless -> CharacterGender.Genderless
-            else -> CharacterGender.Unknown
-        }
+        return CharacterGender.values().first { it.apiValue == this }
     }
 }

@@ -7,6 +7,13 @@
     
     <string name="tt_last_known_location">Last known location:</string>
     <string name="tt_first_seen_in">First seen in:</string>
+    <string name="tt_filter_by_status">Filter by status:</string>
+    <string name="tt_filter_by_gender">Filter by gender:</string>
+    <string name="tt_filter_by_specie">Filter by species:</string>
+    <string name="tt_input_something">Input something</string>
+    <string name="tt_filters">Filters</string>
+    <string name="tt_clear_filters">Clear filters</string>
+    <string name="tt_result_not_found">Result not found</string>
 
     <string name="tv_unknown">Unknown</string>
     <string name="tv_filter">Filter</string>

@@ -8,7 +8,7 @@ data class Character(
     val id: Long = 0,
     val name: String? = "Unknown",
     val status: CharacterStatus = CharacterStatus.Unknown,
-    val species: String? = null,
+    val species: CharacterSpecies = CharacterSpecies.Unknown,
     val type: String? = null,
     val gender: CharacterGender = CharacterGender.Unknown,
     val origin: Location? = null,

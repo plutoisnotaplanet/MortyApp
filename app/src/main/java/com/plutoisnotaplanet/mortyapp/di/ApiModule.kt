@@ -32,11 +32,10 @@ object ApiModule {
     @Provides
     @Singleton
     fun provideImageLoader(
-        @ApplicationContext context: Context,
-        okHttpClient: OkHttpClient
+        @ApplicationContext context: Context
     ): ImageLoader {
         return ImageLoader.Builder(context)
-            .okHttpClient { okHttpClient }
+            .okHttpClient { OkHttpClient() }
             .build()
     }
 

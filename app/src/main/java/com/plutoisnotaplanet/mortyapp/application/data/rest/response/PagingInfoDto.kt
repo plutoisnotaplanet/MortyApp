@@ -1,6 +1,7 @@
 package com.plutoisnotaplanet.mortyapp.application.data.rest.response
 
 import com.google.gson.annotations.SerializedName
+import com.plutoisnotaplanet.mortyapp.application.domain.model.PagingInfo
 
 data class PagingInfoDto(
     @SerializedName("count")
@@ -12,4 +13,10 @@ data class PagingInfoDto(
     @SerializedName("prev")
     val prev: String? = null
 ) {
+
+    fun toModel(): PagingInfo {
+        return PagingInfo(
+            count, pages, next, prev
+        )
+    }
 }

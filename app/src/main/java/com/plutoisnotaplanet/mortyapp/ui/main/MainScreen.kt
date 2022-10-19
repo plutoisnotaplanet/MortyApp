@@ -39,13 +39,11 @@ fun MainScreen() {
     val navController = rememberNavController()
 
     Scaffold(
-        topBar = { TopBar() },
         bottomBar = { BottomNavigationBar(navController) },
         content = { padding ->
             Box(modifier = Modifier.padding(padding)) {
                 Navigation(
-                    navController = navController,
-
+                    navController = navController
                 )
             }
         },
@@ -60,7 +58,10 @@ fun Navigation(navController: NavHostController) {
         rememberLazyListState(),
         rememberLazyListState(),
     )
-    NavHost(navController = navController, startDestination = NavScreen.Characters.route) {
+    NavHost(
+        navController = navController,
+        startDestination = NavScreen.Characters.route
+    ) {
         composable(
             route = NavScreen.Characters.route
         ) {
@@ -136,25 +137,6 @@ fun Navigation(navController: NavHostController) {
 //                }
         }
     }
-}
-
-@Composable
-fun TopBar(
-    showBottomDialog: () -> Unit = {}
-) {
-    TopAppBar(
-        title = { Text(text = stringResource(R.string.app_name), fontSize = 18.sp) },
-        backgroundColor = colorResource(id = R.color.colorPrimary),
-        contentColor = Color.White,
-        actions = {
-            IconButton(onClick = { showBottomDialog() }) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = stringResource(R.string.tv_filter)
-                )
-            }
-        }
-    )
 }
 
 @Composable
