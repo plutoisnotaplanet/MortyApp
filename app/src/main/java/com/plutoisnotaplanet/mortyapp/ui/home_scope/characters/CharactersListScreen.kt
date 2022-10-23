@@ -22,82 +22,51 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plutoisnotaplanet.mortyapp.R
-import com.plutoisnotaplanet.mortyapp.application.data.rest.compose.CharacterImage
+import com.plutoisnotaplanet.mortyapp.application.data.rest.compose.NetworkImage
 import com.plutoisnotaplanet.mortyapp.application.domain.model.*
 import com.plutoisnotaplanet.mortyapp.application.extensions.paging
 import com.plutoisnotaplanet.mortyapp.application.utils.CancelableChip
 import com.plutoisnotaplanet.mortyapp.application.utils.StaggeredGrid
-import com.plutoisnotaplanet.mortyapp.application.utils.Title24
 
 @Composable
 fun CharactersListScreen(
+    modifier: Modifier = Modifier.fillMaxSize(),
     viewModel: CharactersViewModel,
     lazyListState: LazyListState,
-    modifier: Modifier = Modifier,
     selectCharacter: (Long) -> Unit,
 ) {
-    val networkResponse: NetworkResponse<BaseResponse<Character>> by viewModel.characters
 
+    val characters by viewModel.characters
+    val networkState by viewModel.networkState
     val filtersModel by viewModel.filtersState.collectAsState()
 
     Scaffold(
         modifier = modifier
     ) { innerPadding ->
 
-        networkResponse.OnSuccess { characters ->
-            LazyColumn(
-                state = lazyListState,
-                modifier = modifier
-                    .padding(innerPadding)
-                    .background(Color.White)
-            ) {
+        LazyColumn(
+            state = lazyListState,
+            modifier = modifier
+                .padding(innerPadding)
+                .background(Color.White)
+        ) {
 
-                paging(
-                    items = characters.results,
-                    filtersModel = filtersModel,
-                    removeFilter = { viewModel.removeFilter(it) },
-                    currentIndexFlow = viewModel.characterPageStateFlow,
-                    fetch = { viewModel.fetchNextCharactersPage() }
-                ) { item ->
+            paging(
+                items = characters,
+                filtersModel = filtersModel,
+                removeFilter = viewModel::removeFilter,
+                currentIndexFlow = viewModel.characterPageStateFlow,
+                networkState = networkState,
+                fetch = viewModel::fetchNextCharactersPage
+            ) { pagingItem ->
 
-                    CharacterHolder(
-                        character = item,
-                        selectCharacter = selectCharacter
-                    )
-                }
+                CharacterHolder(
+                    character = pagingItem,
+                    selectCharacter = selectCharacter
+                )
+
             }
         }
-
-        when(networkResponse) {
-            NetworkResponse.Loading -> ShowLoader()
-            is NetworkResponse.Error -> ShowError()
-            else -> {}
-        }
-    }
-}
-
-@Composable
-fun ShowLoader() {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(16.dp)
-        )
-    }
-}
-
-@Composable
-fun ShowError() {
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Title24(
-            modifier = Modifier.align(Alignment.Center),
-            title = stringResource(id = R.string.tt_result_not_found)
-        )
     }
 }
 
@@ -127,7 +96,7 @@ fun CharacterHolder(
         ) {
 
             Row {
-                CharacterImage(
+                NetworkImage(
                     imageUrl = character.image,
                     modifier = Modifier
                         .fillMaxHeight()
@@ -178,19 +147,8 @@ fun CharacterStatus(
             .fillMaxWidth()
     ) {
 
-        Canvas(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .size(4.dp)
-        ) {
-            drawCircle(
-                color = character.status.color,
-                radius = 4.dp.toPx()
-            )
-        }
-
         Text(
-            text = character.status.paramName,
+            text = character.status.viewValue,
             style = MaterialTheme.typography.body2,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

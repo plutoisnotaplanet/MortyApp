@@ -27,26 +27,25 @@ import com.plutoisnotaplanet.mortyapp.application.utils.Title24
 fun CharactersFilterScreen(
     viewModel: CharactersViewModel
 ) {
-    val statusesList = viewModel.statuses.asList()
-    val genderList = viewModel.genders.asList()
-    val speciesList = viewModel.species.asList()
+    val statusesList = viewModel.statuses
+    val genderList = viewModel.genders
+    val speciesList = viewModel.species
 
     val currentFilter = viewModel.filtersState.collectAsState().value
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 12.dp)
             .background(color = Color.White),
         verticalArrangement = Arrangement.Top
     ) {
 
-        Spacer(modifier = Modifier.height(24.dp))
-
         ConstraintLayout(
             modifier = Modifier
+                .padding(top = 16.dp)
                 .fillMaxWidth()
                 .height(36.dp)
-                .padding(horizontal = 12.dp)
         ) {
 
             val (title, clearFilters) = createRefs()
@@ -57,7 +56,6 @@ fun CharactersFilterScreen(
                     .constrainAs(title) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
-                        end.linkTo(parent.end)
                     }
             )
 

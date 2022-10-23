@@ -2,7 +2,7 @@ package com.plutoisnotaplanet.mortyapp.application.domain.model
 
 import com.plutoisnotaplanet.mortyapp.application.ApiConstants
 
-enum class CharacterSpecies(override val paramName: String, override val apiValue: String): CharacterStat {
+enum class CharacterSpecies(override val viewValue: String, override val apiValue: String): CharacterStat {
     Human("Human", apiValue = ApiConstants.Human),
     Alien("Alien", apiValue = ApiConstants.Alien),
     Humanoid("Humanoid", apiValue = ApiConstants.Humanoid),

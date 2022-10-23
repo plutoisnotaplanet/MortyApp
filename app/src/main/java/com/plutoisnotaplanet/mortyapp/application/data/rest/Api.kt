@@ -24,7 +24,7 @@ interface Api {
     suspend fun fetchCharacter(@Path("character_id") id: Long): CharacterDto
 
     @GET("location/")
-    suspend fun fetchLocations(@Query("page") page: Long): BaseResponseDto<LocationDto>
+    suspend fun fetchLocations(@Query("page") page: Int): BaseResponseDto<LocationDto>
 
     @GET("location/{location_id}")
     suspend fun fetchLocation(@Path("location_id") id: Long): LocationDto

@@ -4,6 +4,8 @@ object Constants {
 
     const val BASE_URL = "https://rickandmortyapi.com/api/"
 
+    const val APP_ID = "MortyApp"
+
     object BottomNavBarRoutes {
         const val Characters = "characters"
         const val Locations = "locations"

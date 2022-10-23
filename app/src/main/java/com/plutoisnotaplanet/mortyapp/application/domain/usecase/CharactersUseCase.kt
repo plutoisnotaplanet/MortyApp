@@ -8,7 +8,7 @@ interface CharactersUseCase {
     fun getCharacters(
         pageId: Int,
         filterModel: CharactersFilterModel? = null
-    ): Flow<NetworkResponse<BaseResponse<Character>>>
+    ): Flow<NetworkResponse<List<Character>>>
 
     fun getCharacterById(
         id: Long

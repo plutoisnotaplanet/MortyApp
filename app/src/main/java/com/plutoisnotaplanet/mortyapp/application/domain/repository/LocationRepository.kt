@@ -1,11 +1,12 @@
 package com.plutoisnotaplanet.mortyapp.application.domain.repository
 
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Location
+import com.plutoisnotaplanet.mortyapp.application.domain.model.NetworkResponse
 import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository {
 
-    fun loadLocations(id: Long, onSuccess: () -> Unit, onError: (String?) -> Unit): Flow<List<Location>>
+    fun loadLocations(pageId: Int): Flow<NetworkResponse<List<Location>>>
 
-    fun loadLocation(locationId: Long, onSuccess: () -> Unit, onError: (String?) -> Unit): Flow<Location>
+    fun loadLocation(locationId: Long): Flow<NetworkResponse<Location>>
 }

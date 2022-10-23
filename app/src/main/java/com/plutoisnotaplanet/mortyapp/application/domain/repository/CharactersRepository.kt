@@ -1,6 +1,5 @@
 package com.plutoisnotaplanet.mortyapp.application.domain.repository
 
-import com.plutoisnotaplanet.mortyapp.application.domain.model.BaseResponse
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Character
 import com.plutoisnotaplanet.mortyapp.application.domain.model.NetworkResponse
 import kotlinx.coroutines.flow.Flow
@@ -13,5 +12,5 @@ interface CharactersRepository {
 
     fun loadFilteredCharacters(
         map: Map<String, String>
-    ): Flow<NetworkResponse<BaseResponse<Character>>>
+    ): Flow<NetworkResponse<List<Character>>>
 }

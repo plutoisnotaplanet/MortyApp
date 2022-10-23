@@ -1,8 +1,10 @@
 package com.plutoisnotaplanet.mortyapp.ui.main
 
-import android.os.Bundle
+import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -11,16 +13,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
@@ -31,15 +32,30 @@ import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.characters.CharactersScreen
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.episodes.EpisodesScreen
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.locations.LocationsScreen
+import com.plutoisnotaplanet.mortyapp.ui.navigation.DrawerContent
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
 fun MainScreen() {
+
     val navController = rememberNavController()
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) },
+        scaffoldState = scaffoldState,
+        drawerContent = {
+            DrawerContent { route ->
+                coroutineScope.launch {
+                    delay(150)
+                    scaffoldState.drawerState.close()
+                }
+            }
+        },
         content = { padding ->
             Box(modifier = Modifier.padding(padding)) {
                 Navigation(
@@ -47,7 +63,7 @@ fun MainScreen() {
                 )
             }
         },
-        backgroundColor = colorResource(R.color.black) // Set background color to avoid the white flashing when you switch between screens
+        backgroundColor = Color.White // Set background color to avoid the white flashing when you switch between screens
     )
 }
 
@@ -60,7 +76,10 @@ fun Navigation(navController: NavHostController) {
     )
     NavHost(
         navController = navController,
-        startDestination = NavScreen.Characters.route
+        startDestination = NavScreen.Characters.route,
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxSize()
     ) {
         composable(
             route = NavScreen.Characters.route
@@ -77,10 +96,8 @@ fun Navigation(navController: NavHostController) {
         ) {
             LocationsScreen(
                 viewModel = hiltViewModel(),
-                lazyListState = tabStateHolder.locationsLazyListState
-            ) { locationId ->
-                navController.navigate("${NavScreen.LocationDetails.route}/$locationId")
-            }
+                lazyListState = tabStateHolder.locationsLazyGridState
+            )
         }
         composable(
             route = NavScreen.Episodes.route
@@ -139,6 +156,7 @@ fun Navigation(navController: NavHostController) {
     }
 }
 
+
 @Composable
 fun BottomNavigationBar(
     navController: NavController
@@ -165,18 +183,14 @@ fun BottomNavigationBar(
                 selected = currentRoute == item.route,
                 onClick = {
                     navController.navigate(item.route) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
+
                         navController.graph.startDestinationRoute?.let { route ->
                             popUpTo(route) {
                                 saveState = true
                             }
                         }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
+
                         launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
                         restoreState = true
                     }
                 }

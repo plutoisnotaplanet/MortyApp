@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,14 +20,19 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStat
-import com.plutoisnotaplanet.mortyapp.application.domain.model.CharactersFilterModel
 import com.plutoisnotaplanet.mortyapp.application.utils.CancelableChip
 import com.plutoisnotaplanet.mortyapp.application.utils.StaggeredGrid
+import com.plutoisnotaplanet.mortyapp.application.utils.isScrollingUp
+import com.plutoisnotaplanet.mortyapp.ui.common.CollectAsCompose
 import com.plutoisnotaplanet.mortyapp.ui.common.SearchBar
 import com.plutoisnotaplanet.mortyapp.ui.common.SearchDisplay
 import com.plutoisnotaplanet.mortyapp.ui.common.rememberSearchState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(
     ExperimentalComposeUiApi::class,
@@ -40,20 +46,31 @@ fun CharactersScreen(
     selectCharacter: (Long) -> Unit,
 ) {
     val filterBottomSheetState = rememberModalBottomSheetState(
-        ModalBottomSheetValue.Hidden
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
     )
+
+    val searchState by viewModel.searchState
+
+    val state =
+        searchState.CollectAsCompose(
+            debounce = 600,
+        ) { query: TextFieldValue ->
+            viewModel.searchByText(query.text)
+        }
 
     val coroutinesScope = rememberCoroutineScope()
 
-    Scaffold (
-        modifier = modifier
-            .background(Color.White)
-            .fillMaxSize(),
+    Scaffold(
+        modifier = modifier,
         floatingActionButton = {
             FiltersActionButton(
-                isVisible = !filterBottomSheetState.isVisible) {
-                showOrHideDialog(coroutinesScope, filterBottomSheetState)
-            }
+                lazyListState = lazyListState,
+                coroutineScope = coroutinesScope,
+                filterBottomSheetState = filterBottomSheetState,
+                showFiltersDialog = {
+                    showOrHideDialog(coroutinesScope, filterBottomSheetState)
+                })
         },
         floatingActionButtonPosition = FabPosition.End
     ) { padding ->
@@ -63,19 +80,15 @@ fun CharactersScreen(
                 .padding(padding)
         ) {
 
-            val state =
-                rememberSearchState(
-                    suggestions = viewModel.suggestionsList,
-                    timeoutMillis = 600,
-                ) { query: TextFieldValue ->
-                    viewModel.searchByText(query.text)
-                }
-
             val focusManager = LocalFocusManager.current
             val keyboardController = LocalSoftwareKeyboardController.current
 
             val dispatcher: OnBackPressedDispatcher =
                 LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
+
+            BackHandler {
+                showOrHideDialog(coroutinesScope, filterBottomSheetState)
+            }
 
             BackHandler(
                 enabled = state.focused
@@ -88,14 +101,16 @@ fun CharactersScreen(
                     focusManager.clearFocus()
                     keyboardController?.hide()
                 }
-                showOrHideDialog(coroutinesScope, filterBottomSheetState)
             }
 
             SearchBar(
                 query = state.query,
                 onQueryChange = { state.query = it },
                 onSearchFocusChange = { state.focused = it },
-                onClearQuery = { state.query = TextFieldValue("") },
+                onClearQuery = {
+                    state.query = TextFieldValue("")
+                    viewModel.updateData()
+                },
                 onBack = {
                     viewModel.clearFilters()
                     state.query = TextFieldValue("")
@@ -108,16 +123,14 @@ fun CharactersScreen(
 
                 SearchDisplay.Suggestions -> {
                     SuggestionGridLayout(
-                        suggestions = state.suggestions as List<CharacterStat>,
-                        onSuggestionClick = { filter ->
-                            var text = state.query.text
-                            if (text.isEmpty()) text = filter.paramName else text += " ${filter.paramName}"
-                            text.trim()
-                            // Set text and cursor position to end of text
-                            state.query = TextFieldValue(text, TextRange(text.length))
-                            viewModel.resetCharacters()
-                        }, onCancelClick = {
-                        })
+                        suggestions = state.suggestions,
+                        onSuggestionClick = {
+                            viewModel.prepareSuggestionsClick(it)
+                            state.focused = false
+                            focusManager.clearFocus()
+                            state.query = TextFieldValue("")
+                        }
+                    )
                 }
 
                 SearchDisplay.Results -> {
@@ -143,8 +156,7 @@ fun CharactersScreen(
 private fun SuggestionGridLayout(
     modifier: Modifier = Modifier,
     suggestions: List<CharacterStat>,
-    onSuggestionClick: (CharacterStat) -> Unit,
-    onCancelClick: (CharacterStat) -> Unit
+    onSuggestionClick: (CharacterStat) -> Unit
 ) {
     StaggeredGrid(
         modifier = modifier.padding(4.dp)
@@ -154,9 +166,6 @@ private fun SuggestionGridLayout(
                 suggestion = suggestionModel,
                 onClick = {
                     onSuggestionClick(it)
-                },
-                onCancel = {
-                    onCancelClick(it)
                 }
             )
         }
@@ -171,6 +180,8 @@ private fun showOrHideDialog(
 ) {
     if (filterBottomSheetState.isVisible) {
         coroutineScope.launch { filterBottomSheetState.hide() }
-    } else coroutineScope.launch { filterBottomSheetState.show() }
+    } else coroutineScope.launch {
+        filterBottomSheetState.show()
+    }
 }
 

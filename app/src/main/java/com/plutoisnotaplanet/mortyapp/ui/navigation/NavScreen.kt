@@ -5,11 +5,12 @@ import androidx.compose.runtime.Immutable
 @Immutable
 sealed class NavScreen(val route: String) {
 
-    object Home : NavScreen("Home")
-
+    object Splash: NavScreen("Splash")
     object Locations: NavScreen("Locations")
     object Characters: NavScreen("Characters")
     object Episodes: NavScreen("Episodes")
+    object Account: NavScreen("Account")
+    object Settings: NavScreen("Settings")
 
     object CharacterDetails : NavScreen("CharacterDetails") {
 
@@ -31,4 +32,6 @@ sealed class NavScreen(val route: String) {
 
         const val argument0: String = "episodeId"
     }
+
+
 }

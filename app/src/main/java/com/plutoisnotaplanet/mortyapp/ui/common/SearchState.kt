@@ -32,13 +32,12 @@ class SearchState<S> internal constructor(
     var previousQueryText = ""
         private set
 
-    val searchDisplay: SearchDisplay
+    var searchDisplay: SearchDisplay = SearchDisplay.Results
         get() = when {
             focused && query.text.isEmpty() -> SearchDisplay.Suggestions
             else -> {
                 previousQueryText = query.text
                 SearchDisplay.Results
-
             }
         }
 

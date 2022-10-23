@@ -14,7 +14,7 @@ class CharactersInteractor @Inject constructor(
     override fun getCharacters(
         pageId: Int,
         filterModel: CharactersFilterModel?,
-    ): Flow<NetworkResponse<BaseResponse<Character>>> {
+    ): Flow<NetworkResponse<List<Character>>> {
         val map = mutableMapOf<String, String>()
 
         map[ApiConstants.Page] = pageId.toString()
@@ -28,6 +28,9 @@ class CharactersInteractor @Inject constructor(
             }
             filterModel.species?.let {
                 map[ApiConstants.Species] = it.apiValue
+            }
+            filterModel.name?.let {
+                map[ApiConstants.Name] = it.apiValue
             }
         }
 

@@ -102,9 +102,8 @@ dependencies {
     implementation (Dependencies.AndroidX.Lifecycle.viewModel)
 
     // coroutines
-    implementation (Dependencies.Coroutines.core)
+    implementation (Dependencies.Coroutines.android)
     testImplementation (Dependencies.Coroutines.test)
-    testImplementation (Dependencies.Coroutines.android)
 
     // startup
     implementation (Dependencies.startup)

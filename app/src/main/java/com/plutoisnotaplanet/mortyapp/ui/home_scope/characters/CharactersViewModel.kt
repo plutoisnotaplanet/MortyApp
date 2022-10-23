@@ -3,11 +3,13 @@ package com.plutoisnotaplanet.mortyapp.ui.home_scope.characters
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.neverEqualPolicy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plutoisnotaplanet.mortyapp.application.domain.model.*
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Character
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.CharactersUseCase
+import com.plutoisnotaplanet.mortyapp.ui.common.SearchState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -20,68 +22,64 @@ class CharactersViewModel @Inject constructor(
     private val charactersUseCase: CharactersUseCase
 ) : ViewModel() {
 
-    val statuses = CharacterStatus.values()
-    val genders = CharacterGender.values()
-    val species = CharacterSpecies.values()
+    val statuses: List<CharacterStat> = CharacterStatus.values().toList()
+    val genders: List<CharacterStat> = CharacterGender.values().toList()
+    val species: List<CharacterStat> = CharacterSpecies.values().toList()
 
-    private val statusesInStringList = statuses.map { it.paramName }
-    private val gendersInStringList = genders.map { it.paramName }
-    val speciesInStringList = species.map { it.paramName }
+    private val statusesInStringList = statuses.map { it.viewValue }
+    private val gendersInStringList = genders.map { it.viewValue }
+    private val speciesInStringList = species.map { it.viewValue }
 
-    val suggestionsList = statuses.map { it } + genders + species
+    private val _searchState: MutableState<SearchState<CharacterStat>> = mutableStateOf(
+        SearchState(statuses + genders + species)
+    )
+    val searchState: State<SearchState<CharacterStat>> = _searchState
 
-    private val _characters: MutableState<NetworkResponse<BaseResponse<Character>>> =
-        mutableStateOf(NetworkResponse.Loading)
-    val characters: State<NetworkResponse<BaseResponse<Character>>> = _characters
-    val characterPageStateFlow: MutableStateFlow<Int> = MutableStateFlow(1)
+    private val _characters: MutableState<MutableList<Character>> = mutableStateOf(mutableListOf(), neverEqualPolicy())
+    val characters: State<MutableList<Character>> = _characters
 
     val filtersState: MutableStateFlow<CharactersFilterModel> =
         MutableStateFlow(CharactersFilterModel())
 
+    val characterPageStateFlow: MutableStateFlow<Int> = MutableStateFlow(1)
+
+    private val _networkState: MutableState<NetworkResponse<Any>> = mutableStateOf(NetworkResponse.Loading, neverEqualPolicy())
+    val networkState: State<NetworkResponse<Any>> = _networkState
+
     private val newCharactersFlow = characterPageStateFlow.combine(filtersState) { page, filter ->
-        _characters.value = NetworkResponse.Loading
+        _networkState.value = NetworkResponse.Loading
+        Timber.e("trigger ${page} ${filter}")
         page to filter
     }
-        .debounce(200)
         .flatMapLatest {
             val (page, filter) = it
             Timber.e("try to request page $page")
-
             charactersUseCase.getCharacters(
                 pageId = page,
                 filterModel = filter
             )
         }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            newCharactersFlow.collectLatest {
-                _characters.value = it
-            }
-        }
-    }
 
     fun fetchNextCharactersPage() {
-        if (characters.value != NetworkResponse.Loading) {
+        if (_networkState.value != NetworkResponse.Loading) {
             characterPageStateFlow.value++
         }
     }
 
     fun searchByText(filter: String) {
-        resetCharacters()
-
+        filter.trim()
         when {
-
             statusesInStringList.contains(filter) ->
-                statuses.first { it.paramName == filter }.let { addFilter(it) }
+                addFilter(statuses.first { it.viewValue == filter })
 
             gendersInStringList.contains(filter) ->
-                genders.first { it.paramName == filter }.let { addFilter(it) }
+                addFilter(genders.first { it.viewValue == filter })
 
             speciesInStringList.contains(filter) ->
-                species.first { it.paramName == filter }.let { addFilter(it) }
+                addFilter(species.first { it.viewValue == filter })
 
-            else -> filtersState.value.copy(name = filter)
+            else -> addFilter(CharacterName(apiValue = filter))
         }
     }
 
@@ -91,6 +89,7 @@ class CharactersViewModel @Inject constructor(
             is CharacterStatus -> filtersState.value.copy(status = newFilter)
             is CharacterSpecies -> filtersState.value.copy(species = newFilter)
             is CharacterGender -> filtersState.value.copy(gender = newFilter)
+            is CharacterName -> filtersState.value.copy(name = newFilter)
             else -> filtersState.value
         }
     }
@@ -101,18 +100,50 @@ class CharactersViewModel @Inject constructor(
             is CharacterStatus -> filtersState.value.copy(status = null)
             is CharacterSpecies -> filtersState.value.copy(species = null)
             is CharacterGender -> filtersState.value.copy(gender = null)
+            is CharacterName -> filtersState.value.copy(name = null)
             else -> filtersState.value
         }
     }
 
+    fun updateData() {
+        filtersState.value = filtersState.value
+    }
+
+
     fun clearFilters() {
+        if (filtersState.value.isFiltersActive) {
+            resetCharacters()
+            filtersState.value = CharactersFilterModel()
+        }
+    }
+
+    fun prepareSuggestionsClick(suggestion: CharacterStat) {
         resetCharacters()
-        filtersState.value = CharactersFilterModel()
+        searchByText(suggestion.viewValue)
     }
 
-    fun resetCharacters() {
-        _characters.value = NetworkResponse.Loading
-        characterPageStateFlow.value = 1
+    private fun resetCharacters() {
+        characterPageStateFlow.update { 1 }
+        characters.value.clear()
     }
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            newCharactersFlow.collectLatest { response ->
+                _networkState.value = response
+                when (response) {
+                    is NetworkResponse.Success -> {
+                        _characters.value.addAll(response.data)
+                        _characters.value = _characters.value
+                    }
+                    is NetworkResponse.Error -> {
+                        Timber.e(response.message)
+                    }
+                    is NetworkResponse.Loading -> {
+                        Timber.e("Loading")
+                    }
+                }
+            }
+        }
+    }
 }

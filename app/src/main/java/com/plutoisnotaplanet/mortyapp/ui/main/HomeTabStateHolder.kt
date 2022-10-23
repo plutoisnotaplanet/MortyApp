@@ -5,6 +5,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 
 data class HomeTabStateHolder(
     val charactersLazyListState: LazyListState,
-    val locationsLazyListState: LazyListState,
+    val locationsLazyGridState: LazyListState,
     val episodesLazyListState: LazyListState,
 )

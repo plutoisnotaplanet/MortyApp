@@ -5,6 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -69,7 +70,7 @@ fun CancelableChip(
             }
 
             Text(
-                text = suggestion.paramName,
+                text = suggestion.viewValue,
                 style = MaterialTheme.typography.body2,
                 modifier = Modifier.padding(end = 8.dp)
             )
@@ -118,7 +119,7 @@ fun Chip(
             )
         ) {
             Text(
-                text = filter.paramName,
+                text = filter.viewValue,
                 style = MaterialTheme.typography.body2,
                 color = Color.White,
                 modifier = Modifier.padding(8.dp)
@@ -293,4 +294,22 @@ fun StaggeredGrid(
             }
         }
     }
+}
+
+@Composable
+fun LazyListState.isScrollingUp(): Boolean {
+    var previousIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
+    var previousScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
+    return remember(this) {
+        derivedStateOf {
+            if (previousIndex != firstVisibleItemIndex) {
+                previousIndex > firstVisibleItemIndex
+            } else {
+                previousScrollOffset >= firstVisibleItemScrollOffset
+            }.also {
+                previousIndex = firstVisibleItemIndex
+                previousScrollOffset = firstVisibleItemScrollOffset
+            }
+        }
+    }.value
 }

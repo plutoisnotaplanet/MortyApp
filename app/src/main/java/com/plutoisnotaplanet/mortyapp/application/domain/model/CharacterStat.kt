@@ -1,6 +1,6 @@
 package com.plutoisnotaplanet.mortyapp.application.domain.model
 
 interface CharacterStat {
-    val paramName: String
+    val viewValue: String
     val apiValue: String
 }

@@ -56,6 +56,28 @@ fun <S> rememberSearchState(
     }
 }
 
+@Composable
+fun <T>SearchState<T>.CollectAsCompose(
+    debounce: Long,
+    onQueryResult: (TextFieldValue) -> Unit
+    ) =
+    this.also { state ->
+        LaunchedEffect(key1 = Unit) {
+
+            snapshotFlow { state.query }
+                .distinctUntilChanged()
+                .filter { query: TextFieldValue ->
+                    query.text.isNotEmpty() && !state.sameAsPreviousQuery()
+                }
+                .debounce(debounce)
+                .mapLatest { query: TextFieldValue ->
+                    onQueryResult(query)
+                }
+                .collect()
+        }
+    }
+
+
 @ExperimentalAnimationApi
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

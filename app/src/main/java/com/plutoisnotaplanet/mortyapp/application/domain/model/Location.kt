@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class Location(
-    val id: Long? = null,
+    val id: Long = 0,
     val name: String? = null,
     val type: String? = null,
     val dimension: String? = null,

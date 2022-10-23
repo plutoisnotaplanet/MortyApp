@@ -4,7 +4,7 @@ data class CharactersFilterModel(
     val status: CharacterStatus? = null,
     val gender: CharacterGender? = null,
     val species: CharacterSpecies? = null,
-    val name: String? = null
+    val name: CharacterName? = null
 ) {
 
     val isFiltersActive: Boolean

@@ -24,7 +24,7 @@ data class LocationDto(
 
     fun toModel(): Location {
         return Location(
-            id, name, type, dimension, residents, url, created.toUiFormat()
+            id ?: 0, name, type, dimension, residents, url, created.toUiFormat()
         )
     }
 }
