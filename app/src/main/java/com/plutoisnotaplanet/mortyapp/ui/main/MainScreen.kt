@@ -29,9 +29,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.plutoisnotaplanet.mortyapp.R
+import com.plutoisnotaplanet.mortyapp.ui.home_scope.HomeScopeScreen
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.characters.CharactersScreen
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.episodes.EpisodesScreen
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.locations.LocationsScreen
+import com.plutoisnotaplanet.mortyapp.ui.login_scope.SplashScreen
 import com.plutoisnotaplanet.mortyapp.ui.navigation.DrawerContent
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
 import kotlinx.coroutines.delay
@@ -39,27 +41,18 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    viewModel: MainViewModel = hiltViewModel()
+) {
 
     val navController = rememberNavController()
-    val scaffoldState = rememberScaffoldState()
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController) },
-        scaffoldState = scaffoldState,
-        drawerContent = {
-            DrawerContent { route ->
-                coroutineScope.launch {
-                    delay(150)
-                    scaffoldState.drawerState.close()
-                }
-            }
-        },
         content = { padding ->
             Box(modifier = Modifier.padding(padding)) {
                 Navigation(
-                    navController = navController
+                    navController = navController,
+                    isLogged = viewModel.isLogged
                 )
             }
         },
@@ -68,156 +61,37 @@ fun MainScreen() {
 }
 
 @Composable
-fun Navigation(navController: NavHostController) {
-    val tabStateHolder = HomeTabStateHolder(
-        rememberLazyListState(),
-        rememberLazyListState(),
-        rememberLazyListState(),
-    )
+fun Navigation(isLogged: Boolean, navController: NavHostController) {
+
     NavHost(
         navController = navController,
-        startDestination = NavScreen.Characters.route,
+        startDestination = NavScreen.Splash.route,
         modifier = Modifier
             .background(Color.White)
             .fillMaxSize()
     ) {
         composable(
-            route = NavScreen.Characters.route
+            route = NavScreen.Splash.route
         ) {
-            CharactersScreen(
-                viewModel = hiltViewModel(),
-                lazyListState = tabStateHolder.charactersLazyListState
-            ) { characterId ->
-                navController.navigate("${NavScreen.CharacterDetails.route}/$characterId")
+            SplashScreen {
+                navController.navigate(if (isLogged) NavScreen.NavHomeScope.route else NavScreen.Login.route)
             }
         }
+
         composable(
-            route = NavScreen.Locations.route
+            route = NavScreen.Login.route
         ) {
-            LocationsScreen(
-                viewModel = hiltViewModel(),
-                lazyListState = tabStateHolder.locationsLazyGridState
-            )
+            
         }
         composable(
-            route = NavScreen.Episodes.route
+            route = NavScreen.Registration.route
         ) {
-            EpisodesScreen(
-                viewModel = hiltViewModel(),
-                lazyListState = tabStateHolder.episodesLazyListState
-            ) { episodeId ->
-                navController.navigate("${NavScreen.EpisodeDetails.route}/$episodeId")
-            }
+            
         }
         composable(
-            route = NavScreen.CharacterDetails.routeWithArgument,
-            arguments = listOf(
-                navArgument(NavScreen.CharacterDetails.argument0) { type = NavType.LongType }
-            )
-        ) { backStackEntry ->
-
-            val characterId =
-                backStackEntry.arguments?.getLong(NavScreen.CharacterDetails.argument0)
-                    ?: return@composable
-
-//                MovieDetailScreen(posterId, hiltViewModel()) {
-//                    navController.navigateUp()
-//                }
-        }
-        composable(
-            route = NavScreen.LocationDetails.routeWithArgument,
-            arguments = listOf(
-                navArgument(NavScreen.LocationDetails.argument0) { type = NavType.LongType }
-            )
-        ) { backStackEntry ->
-
-            val locationId = backStackEntry.arguments?.getLong(NavScreen.LocationDetails.argument0)
-                ?: return@composable
-
-//                TvDetailScreen(posterId, hiltViewModel()) {
-//                    navController.navigateUp()
-//                }
-        }
-        composable(
-            route = NavScreen.EpisodeDetails.routeWithArgument,
-            arguments = listOf(
-                navArgument(NavScreen.EpisodeDetails.argument0) { type = NavType.LongType }
-            )
-        ) { backStackEntry ->
-
-            val episodeId =
-                backStackEntry.arguments?.getLong(NavScreen.EpisodeDetails.argument0)
-                    ?: return@composable
-
-//                PersonDetailScreen(personId, hiltViewModel()) {
-//                    navController.navigateUp()
-//                }
+            route = NavScreen.NavHomeScope.route
+        ) {
+            HomeScopeScreen(navController = navController)
         }
     }
-}
-
-
-@Composable
-fun BottomNavigationBar(
-    navController: NavController
-) {
-    val items = MainScreenHomeTab.values()
-    BottomNavigation(
-        backgroundColor = colorResource(id = R.color.colorPrimary),
-        contentColor = colorResource(id = R.color.colorPrimaryDark)
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-        items.forEach { item ->
-            BottomNavigationItem(
-                icon = {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = stringResource(id = item.title)
-                    )
-                },
-                label = { Text(text = stringResource(id = item.title)) },
-                selectedContentColor = Color.White,
-                unselectedContentColor = Color.White.copy(0.4f),
-                alwaysShowLabel = true,
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
-                            }
-                        }
-
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            )
-        }
-    }
-}
-
-@Immutable
-enum class MainScreenHomeTab(
-    @StringRes val title: Int,
-    val icon: ImageVector,
-    val route: String
-) {
-    CHARACTERS(
-        R.string.menu_characters,
-        Icons.Filled.Person,
-        NavScreen.Characters.route
-    ),
-    LOCATIONS(
-        R.string.menu_locations,
-        Icons.Filled.LocationOn,
-        NavScreen.Locations.route
-    ),
-    EPISODES(
-        R.string.menu_episodes,
-        Icons.Filled.PlayArrow,
-        NavScreen.Episodes.route
-    )
 }

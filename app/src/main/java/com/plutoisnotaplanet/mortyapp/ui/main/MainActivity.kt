@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CompositionLocalProvider(LocalCoilImageLoader provides viewModel.imageLoader) {
 
-                MainScreen()
+                MainScreen(viewModel)
 
             }
         }

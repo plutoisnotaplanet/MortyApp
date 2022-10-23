@@ -55,7 +55,6 @@ fun LocationsScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LocationHolder(
     modifier: Modifier = Modifier,
@@ -92,22 +91,6 @@ fun LocationHolder(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-//
-//                    CharacterStatus(character = character)
-//
-//                    Spacer(modifier = Modifier.height(8.dp))
-//
-//                    CharacterInfoField(
-//                        title = stringResource(id = R.string.tt_last_known_location),
-//                        value = character.location?.name ?: stringResource(id = R.string.tv_unknown)
-//                    )
-//
-//                    Spacer(modifier = Modifier.height(4.dp))
-//
-//                    CharacterInfoField(
-//                        title = stringResource(id = R.string.tt_first_seen_in),
-//                        value = character.origin?.name ?: stringResource(id = R.string.tv_unknown)
-//                    )
                 }
             }
         }

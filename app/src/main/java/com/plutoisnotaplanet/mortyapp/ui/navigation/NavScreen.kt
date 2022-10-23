@@ -6,6 +6,11 @@ import androidx.compose.runtime.Immutable
 sealed class NavScreen(val route: String) {
 
     object Splash: NavScreen("Splash")
+
+    object Login: NavScreen("Login")
+    object Registration: NavScreen("Registration")
+
+    object NavHomeScope: NavScreen("Home")
     object Locations: NavScreen("Locations")
     object Characters: NavScreen("Characters")
     object Episodes: NavScreen("Episodes")

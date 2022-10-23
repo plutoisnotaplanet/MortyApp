@@ -1,8 +1,10 @@
 package com.plutoisnotaplanet.mortyapp.di
 
 import com.plutoisnotaplanet.mortyapp.application.data.interactors.CharactersInteractor
+import com.plutoisnotaplanet.mortyapp.application.data.interactors.LaunchInteractor
 import com.plutoisnotaplanet.mortyapp.application.data.interactors.LocationsInteractor
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.CharactersUseCase
+import com.plutoisnotaplanet.mortyapp.application.domain.usecase.LaunchUseCase
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.LocationsUseCase
 import dagger.Binds
 import dagger.Module
@@ -21,4 +23,8 @@ interface UseCaseBindModule {
     @Binds
     @ViewModelScoped
     fun bindLocationUseCaseToLocationInteractor(locationsInteractor: LocationsInteractor): LocationsUseCase
+
+    @Binds
+    @ViewModelScoped
+    fun bindLaunchUseCaseToLaunchInteractor(launchInteractor: LaunchInteractor): LaunchUseCase
 }
