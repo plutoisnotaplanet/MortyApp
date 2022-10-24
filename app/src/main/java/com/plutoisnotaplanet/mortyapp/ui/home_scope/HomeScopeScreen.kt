@@ -25,6 +25,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.characters.CharactersScreen
@@ -39,11 +40,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScopeScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController
 ) {
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
+
+    val navController = rememberNavController()
 
     Scaffold(
         scaffoldState = scaffoldState,

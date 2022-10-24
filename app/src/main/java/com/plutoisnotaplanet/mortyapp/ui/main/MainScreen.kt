@@ -47,17 +47,18 @@ fun MainScreen(
 
     val navController = rememberNavController()
 
-    Scaffold(
-        content = { padding ->
-            Box(modifier = Modifier.padding(padding)) {
-                Navigation(
-                    navController = navController,
-                    isLogged = viewModel.isLogged
-                )
-            }
-        },
-        backgroundColor = Color.White // Set background color to avoid the white flashing when you switch between screens
-    )
+//    Scaffold(
+//        content = { padding ->
+//
+//        },
+//        backgroundColor = Color.White // Set background color to avoid the white flashing when you switch between screens
+//    )
+    Box(modifier = Modifier.background(Color.White)) {
+        Navigation(
+            navController = navController,
+            isLogged = viewModel.isLogged
+        )
+    }
 }
 
 @Composable
@@ -68,30 +69,30 @@ fun Navigation(isLogged: Boolean, navController: NavHostController) {
         startDestination = NavScreen.Splash.route,
         modifier = Modifier
             .background(Color.White)
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         composable(
             route = NavScreen.Splash.route
         ) {
-            SplashScreen {
-                navController.navigate(if (isLogged) NavScreen.NavHomeScope.route else NavScreen.Login.route)
-            }
+            SplashScreen(
+                navHostController = navController
+            ) { isLogged }
         }
 
         composable(
             route = NavScreen.Login.route
         ) {
-            
+
         }
         composable(
             route = NavScreen.Registration.route
         ) {
-            
+
         }
         composable(
             route = NavScreen.NavHomeScope.route
         ) {
-            HomeScopeScreen(navController = navController)
+            HomeScopeScreen()
         }
     }
 }
