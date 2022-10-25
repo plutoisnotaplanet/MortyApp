@@ -5,6 +5,7 @@ plugins {
     id ("org.jetbrains.kotlin.android")
     id ("kotlin-kapt")
     id ("dagger.hilt.android.plugin")
+    id ("com.google.gms.google-services")
 }
 
 android {
@@ -75,10 +76,16 @@ dependencies {
     implementation (Dependencies.AndroidX.Compose.activity)
     implementation (Dependencies.AndroidX.Compose.navigationCompose)
     implementation (Dependencies.AndroidX.Compose.constraint)
+    implementation (Dependencies.AndroidX.Compose.materialIcons)
 
     implementation (Dependencies.AndroidX.Compose.accompanistInsets)
     implementation (Dependencies.AndroidX.Compose.accompanistFlow)
     implementation (Dependencies.AndroidX.Compose.orchestra)
+
+    //google services
+    implementation (platform(Dependencies.GoogleServices.platformBom))
+    implementation (Dependencies.GoogleServices.analytics)
+    implementation (Dependencies.GoogleServices.auth)
 
     //image loading
     implementation (Dependencies.Coil.landscapist)

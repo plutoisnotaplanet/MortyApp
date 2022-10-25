@@ -4,8 +4,6 @@ import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,26 +11,19 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStat
-import com.plutoisnotaplanet.mortyapp.application.utils.CancelableChip
-import com.plutoisnotaplanet.mortyapp.application.utils.StaggeredGrid
-import com.plutoisnotaplanet.mortyapp.application.utils.isScrollingUp
-import com.plutoisnotaplanet.mortyapp.ui.common.CollectAsCompose
-import com.plutoisnotaplanet.mortyapp.ui.common.SearchBar
-import com.plutoisnotaplanet.mortyapp.ui.common.SearchDisplay
-import com.plutoisnotaplanet.mortyapp.ui.common.rememberSearchState
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.CancelableChip
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.StaggeredGrid
+import com.plutoisnotaplanet.mortyapp.ui.theme.compose.CollectAsCompose
+import com.plutoisnotaplanet.mortyapp.ui.theme.compose.ExtendedScrollingUpButton
+import com.plutoisnotaplanet.mortyapp.ui.theme.compose.SearchBar
+import com.plutoisnotaplanet.mortyapp.ui.theme.compose.SearchDisplay
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @OptIn(
     ExperimentalComposeUiApi::class,
@@ -52,6 +43,8 @@ fun CharactersScreen(
 
     val searchState by viewModel.searchState
 
+    val isScrollUp by derivedStateOf { lazyListState.firstVisibleItemIndex > 0 }
+
     val state =
         searchState.CollectAsCompose(
             debounce = 600,
@@ -65,14 +58,13 @@ fun CharactersScreen(
         modifier = modifier,
         floatingActionButton = {
             FiltersActionButton(
-                lazyListState = lazyListState,
-                coroutineScope = coroutinesScope,
                 filterBottomSheetState = filterBottomSheetState,
-                showFiltersDialog = {
-                    showOrHideDialog(coroutinesScope, filterBottomSheetState)
-                })
+                showFiltersDialog = { showOrHideDialog(coroutinesScope, filterBottomSheetState) },
+                isScrollUpVisible = isScrollUp,
+                scrollToTop = { coroutinesScope.launch { lazyListState.animateScrollToItem(0) } }
+            )
         },
-        floatingActionButtonPosition = FabPosition.End
+        floatingActionButtonPosition = if (isScrollUp) FabPosition.Center else FabPosition.End,
     ) { padding ->
         Column(
             modifier = Modifier
@@ -86,7 +78,7 @@ fun CharactersScreen(
             val dispatcher: OnBackPressedDispatcher =
                 LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
 
-            BackHandler {
+            BackHandler(enabled = filterBottomSheetState.isVisible) {
                 showOrHideDialog(coroutinesScope, filterBottomSheetState)
             }
 
@@ -147,7 +139,7 @@ fun CharactersScreen(
             sheetState = filterBottomSheetState,
             sheetElevation = 24.dp,
             sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-            sheetContent = { CharactersFilterScreen(viewModel = viewModel) }
+            sheetContent = { CharactersFilterScreen(viewModel = viewModel) },
         ) {}
     }
 }

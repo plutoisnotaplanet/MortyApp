@@ -1,8 +1,10 @@
 package com.plutoisnotaplanet.mortyapp.di
 
+import com.plutoisnotaplanet.mortyapp.application.data.interactors.AuthInteractor
 import com.plutoisnotaplanet.mortyapp.application.data.interactors.CharactersInteractor
 import com.plutoisnotaplanet.mortyapp.application.data.interactors.LaunchInteractor
 import com.plutoisnotaplanet.mortyapp.application.data.interactors.LocationsInteractor
+import com.plutoisnotaplanet.mortyapp.application.domain.usecase.AuthUseCase
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.CharactersUseCase
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.LaunchUseCase
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.LocationsUseCase
@@ -27,4 +29,8 @@ interface UseCaseBindModule {
     @Binds
     @ViewModelScoped
     fun bindLaunchUseCaseToLaunchInteractor(launchInteractor: LaunchInteractor): LaunchUseCase
+
+    @Binds
+    @ViewModelScoped
+    fun bindAuthUseCaseToAuthInteractor(authInteractor: AuthInteractor): AuthUseCase
 }

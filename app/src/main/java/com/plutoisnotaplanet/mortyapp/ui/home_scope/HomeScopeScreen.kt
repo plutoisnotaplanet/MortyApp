@@ -19,27 +19,29 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.characters.CharactersScreen
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.episodes.EpisodesScreen
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.locations.LocationsScreen
 import com.plutoisnotaplanet.mortyapp.ui.main.HomeTabStateHolder
+import com.plutoisnotaplanet.mortyapp.ui.main.MainViewModel
 import com.plutoisnotaplanet.mortyapp.ui.navigation.DrawerContent
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
+import com.plutoisnotaplanet.mortyapp.ui.navigation.NavigationDrawerItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun HomeScopeScreen(
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel,
+    mainNavController: NavHostController
 ) {
 
     val scaffoldState = rememberScaffoldState()
@@ -47,11 +49,24 @@ fun HomeScopeScreen(
 
     val navController = rememberNavController()
 
+    Timber.e("init homescope screen")
+
     Scaffold(
         scaffoldState = scaffoldState,
         bottomBar = { BottomNavigationBar(navController) },
         drawerContent = {
             DrawerContent { route ->
+                when(route) {
+                    NavigationDrawerItem.LOGOUT.route -> {
+                        viewModel.logout()
+                        mainNavController.navigate(
+                            route = NavScreen.Splash.route,
+                            navOptions = NavOptions.Builder().setPopUpTo(
+                                route = NavScreen.NavHomeScope.route, inclusive = true
+                            ).build()
+                        )
+                    }
+                }
                 coroutineScope.launch {
                     delay(150)
                     scaffoldState.drawerState.close()

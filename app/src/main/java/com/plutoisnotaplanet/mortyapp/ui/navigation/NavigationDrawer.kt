@@ -1,5 +1,6 @@
 package com.plutoisnotaplanet.mortyapp.ui.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,7 +39,7 @@ fun DrawerContent(
     itemClick: (String) -> Unit
 ) {
 
-    val itemsList = prepareNavigationDrawerItems()
+    val itemsList = NavigationDrawerItem.values()
 
     LazyColumn(
         modifier = Modifier
@@ -77,7 +79,7 @@ fun DrawerContent(
 
         items(itemsList) { item ->
             NavigationListItem(item = item) {
-                itemClick(item.label)
+                itemClick(item.route)
             }
         }
     }
@@ -111,7 +113,7 @@ private fun NavigationListItem(
 
         Text(
             modifier = Modifier.padding(start = 16.dp),
-            text = item.label,
+            text = item.route,
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
             color = Color.White
@@ -119,39 +121,13 @@ private fun NavigationListItem(
     }
 }
 
-@Composable
-private fun prepareNavigationDrawerItems(): List<NavigationDrawerItem> {
-    val itemsList = arrayListOf<NavigationDrawerItem>()
-
-    itemsList.add(
-        NavigationDrawerItem(
-            image = Icons.Filled.Home,
-            label = "Home"
-        )
-    )
-    itemsList.add(
-        NavigationDrawerItem(
-            image = Icons.Filled.AccountBox,
-            label = "Account"
-        )
-    )
-    itemsList.add(
-        NavigationDrawerItem(
-            image = Icons.Filled.Settings,
-            label = "Settings"
-        )
-    )
-    itemsList.add(
-        NavigationDrawerItem(
-            image = Icons.Filled.ExitToApp,
-            label = "Logout"
-        )
-    )
-
-    return itemsList
-}
-
-data class NavigationDrawerItem(
+@Immutable
+enum class NavigationDrawerItem(
     val image: ImageVector,
-    val label: String
-)
+    val route: String
+) {
+    HOME(Icons.Filled.Home, "Home"),
+    ACCOUNT(Icons.Filled.AccountBox, "Account"),
+    SETTINGS(Icons.Filled.Settings, "Settings"),
+    LOGOUT(Icons.Filled.ExitToApp, "Logout")
+}

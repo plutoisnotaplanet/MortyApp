@@ -25,8 +25,8 @@ import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.data.rest.compose.NetworkImage
 import com.plutoisnotaplanet.mortyapp.application.domain.model.*
 import com.plutoisnotaplanet.mortyapp.application.extensions.paging
-import com.plutoisnotaplanet.mortyapp.application.utils.CancelableChip
-import com.plutoisnotaplanet.mortyapp.application.utils.StaggeredGrid
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.CancelableChip
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.StaggeredGrid
 
 @Composable
 fun CharactersListScreen(

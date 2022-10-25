@@ -22,5 +22,4 @@ class MainViewModel @Inject constructor(
     fun logout() {
         launchUseCase.logout()
     }
-
 }

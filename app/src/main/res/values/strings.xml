@@ -4,7 +4,7 @@
     <string name="menu_characters">Characters</string>
     <string name="menu_locations">Locations</string>
     <string name="menu_episodes">Episodes</string>
-    
+
     <string name="tt_last_known_location">Last known location:</string>
     <string name="tt_first_seen_in">First seen in:</string>
     <string name="tt_filter_by_status">Filter by status:</string>
@@ -15,6 +15,25 @@
     <string name="tt_clear_filters">Clear filters</string>
     <string name="tt_result_not_found">Result not found</string>
 
+    <string name="tv_password_is_invalid">Password is not valid by rules:
+     <br>-length between 8-16,</br>
+        <br>-at least one number,</br>
+        <br>-at least one letter,</br>
+        <br>-at least one character</br>
+    </string>
+    <string name="tv_password_is_too_long">Password is too long</string>
+    <string name="tv_password_is_too_short">Password is too short</string>
+    <string name="tv_email_is_not_valid">Email is not valid</string>
+
+    <string name="tv_success_sign_up">You successfully was registered</string>
+    <string name="tv_email_restore_password">Password was restored. Wait for e-mail</string>
+    <string name="tv_forgot_password">Forgot password?</string>
+
+    <string name="tv_scroll_up">Scroll up</string>
+
     <string name="tv_unknown">Unknown</string>
     <string name="tv_filter">Filter</string>
+    <string name="tt_password">Password</string>
+    <string name="tt_email">E-mail</string>
+    <string name="tv_apply">Apply</string>
 </resources>

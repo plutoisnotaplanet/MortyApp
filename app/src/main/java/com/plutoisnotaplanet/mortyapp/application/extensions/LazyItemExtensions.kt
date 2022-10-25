@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.*
-import com.plutoisnotaplanet.mortyapp.application.utils.Title24
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.Title24
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.characters.ActiveFilters
 import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
@@ -78,7 +78,7 @@ inline fun <T> LazyListScope.paging(
     crossinline removeFilter: (CharacterStat) -> Unit = {},
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit,
 ) {
-    val currentIndex = currentIndexFlow.value
+    val currentIndex = currentIndexFlow.value.takeIf { it != 1 } ?: 2
 
     Timber.e("trigger new list ${items.size}")
 
@@ -94,6 +94,8 @@ inline fun <T> LazyListScope.paging(
 
         itemContent(item)
 
+        Timber.e("${index + threshold + 1} >= ${pageSize * (currentIndex - 1)}")
+
         if ((index + threshold + 1) >= pageSize * (currentIndex - 1)) {
             fetch()
         }
@@ -102,7 +104,7 @@ inline fun <T> LazyListScope.paging(
         when (networkState) {
             is NetworkResponse.Loading -> {
                 item {
-                    if (currentIndex == 1) {
+                    if (currentIndex == 2) {
                         ShowLoader(
                             modifier = Modifier.fillParentMaxSize()
                         )

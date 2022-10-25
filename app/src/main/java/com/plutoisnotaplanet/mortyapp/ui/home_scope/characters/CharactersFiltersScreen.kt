@@ -15,13 +15,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.plutoisnotaplanet.mortyapp.R
-import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterGender
-import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterSpecies
-import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStat
-import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStatus
-import com.plutoisnotaplanet.mortyapp.application.utils.ChipGroup
-import com.plutoisnotaplanet.mortyapp.application.utils.SubTitle14
-import com.plutoisnotaplanet.mortyapp.application.utils.Title24
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.ChipGroup
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.DefaultClickableText
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.SubTitle14
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.Title24
 
 @Composable
 fun CharactersFilterScreen(
@@ -59,7 +56,7 @@ fun CharactersFilterScreen(
                     }
             )
 
-            ClickableText(
+            DefaultClickableText(
                 modifier = Modifier
                     .constrainAs(clearFilters) {
                         top.linkTo(title.top)
@@ -69,11 +66,7 @@ fun CharactersFilterScreen(
                 onClick = {
                     viewModel.clearFilters()
                 },
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = colorResource(id = R.color.colorAccent))) {
-                        append(stringResource(id = R.string.tt_clear_filters))
-                    }
-                }
+                title = stringResource(id = R.string.tt_clear_filters)
             )
         }
 

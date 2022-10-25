@@ -1,6 +1,7 @@
 package com.plutoisnotaplanet.buildsrc
 
 object Dependencies {
+
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.3.0"
     const val junit = "junit:junit:4.13"
 
@@ -9,6 +10,13 @@ object Dependencies {
     const val timber = "com.jakewharton.timber:timber:5.0.1"
 
     const val startup = "androidx.startup:startup-runtime:1.1.1"
+
+    object GoogleServices {
+        const val core = "com.google.gms:google-services:4.3.13"
+        const val platformBom = "com.google.firebase:firebase-bom:31.0.1"
+        const val analytics = "com.google.firebase:firebase-analytics-ktx"
+        const val auth = "com.google.firebase:firebase-auth"
+    }
 
     object Hilt {
         private const val hiltCoreVersion = "2.44"
@@ -89,6 +97,7 @@ object Dependencies {
             private const val navigationComposeVersion = "2.5.1"
             private const val constraintVersion = "1.0.1"
 
+            const val materialIcons = "androidx.compose.material:material-icons-extended:$version"
             const val navigationCompose =  "androidx.navigation:navigation-compose:$navigationComposeVersion"
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val compiler = "androidx.compose.compiler:compiler:$compilerVersion"

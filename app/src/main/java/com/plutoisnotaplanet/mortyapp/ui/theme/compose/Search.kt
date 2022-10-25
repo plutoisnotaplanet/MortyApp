@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.ui.common
+package com.plutoisnotaplanet.mortyapp.ui.theme.compose
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi

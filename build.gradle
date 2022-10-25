@@ -10,6 +10,7 @@ buildscript {
         classpath Dependencies.androidGradlePlugin
         classpath Dependencies.Kotlin.gradlePlugin
         classpath Dependencies.Hilt.gradleHilt
+        classpath Dependencies.GoogleServices.core
     }
 }
 

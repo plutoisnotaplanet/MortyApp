@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.plutoisnotaplanet.mortyapp.application.domain.model.*
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Character
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.CharactersUseCase
-import com.plutoisnotaplanet.mortyapp.ui.common.SearchState
+import com.plutoisnotaplanet.mortyapp.ui.theme.compose.SearchState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -51,6 +51,7 @@ class CharactersViewModel @Inject constructor(
         Timber.e("trigger ${page} ${filter}")
         page to filter
     }
+        .distinctUntilChanged()
         .flatMapLatest {
             val (page, filter) = it
             Timber.e("try to request page $page")
@@ -62,12 +63,14 @@ class CharactersViewModel @Inject constructor(
 
 
     fun fetchNextCharactersPage() {
+        Timber.e("fetch next")
         if (_networkState.value != NetworkResponse.Loading) {
             characterPageStateFlow.value++
         }
     }
 
     fun searchByText(filter: String) {
+        Timber.e("search by text")
         filter.trim()
         when {
             statusesInStringList.contains(filter) ->
@@ -84,6 +87,7 @@ class CharactersViewModel @Inject constructor(
     }
 
     fun addFilter(newFilter: CharacterStat?) {
+        Timber.e("addFilter")
         resetCharacters()
         filtersState.value = when (newFilter) {
             is CharacterStatus -> filtersState.value.copy(status = newFilter)
@@ -95,6 +99,7 @@ class CharactersViewModel @Inject constructor(
     }
 
     fun removeFilter(filter: CharacterStat) {
+        Timber.e("removeFilter")
         resetCharacters()
         filtersState.value = when (filter) {
             is CharacterStatus -> filtersState.value.copy(status = null)
@@ -106,11 +111,12 @@ class CharactersViewModel @Inject constructor(
     }
 
     fun updateData() {
-        filtersState.value = filtersState.value
+        Timber.e("update date")
+        filtersState.update { filtersState.value }
     }
 
-
     fun clearFilters() {
+        Timber.e("clearFilter")
         if (filtersState.value.isFiltersActive) {
             resetCharacters()
             filtersState.value = CharactersFilterModel()
@@ -118,6 +124,7 @@ class CharactersViewModel @Inject constructor(
     }
 
     fun prepareSuggestionsClick(suggestion: CharacterStat) {
+        Timber.e("sugget click")
         resetCharacters()
         searchByText(suggestion.viewValue)
     }
@@ -134,7 +141,6 @@ class CharactersViewModel @Inject constructor(
                 when (response) {
                     is NetworkResponse.Success -> {
                         _characters.value.addAll(response.data)
-                        _characters.value = _characters.value
                     }
                     is NetworkResponse.Error -> {
                         Timber.e(response.message)

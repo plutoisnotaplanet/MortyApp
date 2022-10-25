@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1088854345432",
+    "project_id": "mortyapp-147ca",
+    "storage_bucket": "mortyapp-147ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1088854345432:android:94b8ec97f03865f67139ad",
+        "android_client_info": {
+          "package_name": "com.plutoisnotaplanet.mortyapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1088854345432-l7tnrrg03mt1tvidbpc2qk17crje9r1h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.plutoisnotaplanet.mortyapp",
+            "certificate_hash": "3e382585d3795a754bc9f60e34d480ce221c17e7"
+          }
+        },
+        {
+          "client_id": "1088854345432-jn03c8t5rk9dv2ft9lu3vu4gvcdpj1uh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYdYVvslEfk_w05bYmL0xjYCmhDTV16Gw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1088854345432-jn03c8t5rk9dv2ft9lu3vu4gvcdpj1uh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

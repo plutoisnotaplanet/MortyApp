@@ -1,9 +1,8 @@
-package com.plutoisnotaplanet.mortyapp.application.data.repository_impl
+package com.plutoisnotaplanet.mortyapp.application.data.repository_impl.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.plutoisnotaplanet.mortyapp.application.Constants
-import com.plutoisnotaplanet.mortyapp.application.data.repository_impl.delegate.sharedPreferences
 import javax.inject.Inject
 
 class Preferences @Inject constructor(
@@ -30,10 +29,7 @@ class Preferences @Inject constructor(
     var isLogged: Boolean by sharedPreferences(preferences, IS_LOGGED, false)
 
     fun logout() {
-        isLogged = false
+        editor.remove(IS_LOGGED)
         editor.commit()
     }
-
-
-
 }

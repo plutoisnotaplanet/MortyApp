@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.application.data.repository_impl.delegate
+package com.plutoisnotaplanet.mortyapp.application.data.repository_impl.preferences
 
 import android.content.SharedPreferences
 import com.google.gson.GsonBuilder

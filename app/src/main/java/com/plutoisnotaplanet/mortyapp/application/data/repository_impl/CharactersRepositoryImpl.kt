@@ -3,6 +3,7 @@ package com.plutoisnotaplanet.mortyapp.application.data.repository_impl
 import com.plutoisnotaplanet.mortyapp.application.data.rest.Api
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Character
 import com.plutoisnotaplanet.mortyapp.application.domain.model.NetworkResponse
+import com.plutoisnotaplanet.mortyapp.application.domain.model.runResulting
 import com.plutoisnotaplanet.mortyapp.application.domain.repository.CharactersRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -19,6 +20,7 @@ class CharactersRepositoryImpl @Inject constructor(
         onError: (String?) -> Unit
     ): Flow<List<Character>> {
         return flow {
+
 
             try {
 
@@ -71,7 +73,6 @@ class CharactersRepositoryImpl @Inject constructor(
             val response = api.fetchFilteredCharacters(map)
 
             val charactersListDto = response.results
-
 
             emit(
                 NetworkResponse.Success(

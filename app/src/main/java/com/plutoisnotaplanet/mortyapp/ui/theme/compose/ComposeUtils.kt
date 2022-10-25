@@ -1,7 +1,8 @@
-package com.plutoisnotaplanet.mortyapp.application.utils
+package com.plutoisnotaplanet.mortyapp.application.utils.compose
 
 import android.graphics.Point
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,156 +37,6 @@ import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStat
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStatus
 
-@Composable
-fun CancelableChip(
-    modifier: Modifier = Modifier.padding(4.dp),
-    suggestion: CharacterStat,
-    @DrawableRes drawableRes: Int = -1,
-    onClick: ((CharacterStat) -> Unit)? = null,
-    onCancel: ((CharacterStat) -> Unit)? = null
-) {
-
-    Surface(
-        elevation = 0.dp,
-        modifier = modifier,
-        color = Color(0xFFE0E0E0),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clickable {
-                    onClick?.run {
-                        invoke(suggestion)
-                    }
-                }
-                .padding(vertical = 8.dp, horizontal = 10.dp)
-        ) {
-
-            if (drawableRes != -1) {
-                Image(
-                    painter = painterResource(drawableRes),
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(20.dp)
-                        .clip(CircleShape),
-                    contentDescription = null
-                )
-            }
-
-            Text(
-                text = suggestion.viewValue,
-                style = MaterialTheme.typography.body2,
-                modifier = Modifier.padding(end = 8.dp)
-            )
-
-            Surface(color = Color.DarkGray, modifier = Modifier, shape = CircleShape) {
-                IconButton(
-                    onClick = {
-                        onCancel?.run {
-                            invoke(suggestion)
-                        }
-                    },
-                    modifier = Modifier
-                        .size(16.dp)
-                        .padding(1.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        tint = Color(0xFFE0E0E0),
-                        contentDescription = null
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Chip(
-    filter: CharacterStat = CharacterStatus.Unknown,
-    isSelected: Boolean = false,
-    onSelectionChanged: (CharacterStat) -> Unit = {},
-) {
-    Surface(
-        modifier = Modifier.padding(4.dp),
-        elevation = 8.dp,
-        shape = MaterialTheme.shapes.medium,
-        color = if (isSelected) colorResource(id = R.color.colorPrimary) else colorResource(id = R.color.colorAccent)
-    ) {
-        Row(modifier = Modifier
-            .toggleable(
-                value = isSelected,
-                onValueChange = {
-                    onSelectionChanged(filter)
-                }
-            )
-        ) {
-            Text(
-                text = filter.viewValue,
-                style = MaterialTheme.typography.body2,
-                color = Color.White,
-                modifier = Modifier.padding(8.dp)
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ChipGroup(
-    chips: List<CharacterStat> = emptyList(),
-    selectedChip: CharacterStat? = null,
-    onSelectedChanged: (CharacterStat) -> Unit = {},
-) {
-    if (chips.isEmpty()) return
-    Column(modifier = Modifier.padding(8.dp)) {
-        StaggeredGrid {
-            chips.forEach { chip ->
-                Chip(
-                    filter = chip,
-                    isSelected = chip == selectedChip,
-                    onSelectionChanged = onSelectedChanged
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SubTitle14(
-    modifier: Modifier = Modifier.padding(start = 12.dp),
-    title: String = stringResource(id = R.string.tv_unknown),
-) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.subtitle1,
-        fontSize = 14.sp,
-        color = Color.Black,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Title24(
-    modifier: Modifier = Modifier.padding(start = 12.dp),
-    title: String = stringResource(id = R.string.tv_unknown)
-) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.h6,
-        fontSize = 24.sp,
-        color = Color.Black,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier
-    )
-}
 
 /**
  * Staggered grid layout for displaying items as GridLayout in classic View
@@ -318,24 +169,3 @@ fun LazyListState.isScrollingUp(): Boolean {
     }.value
 }
 
-@Composable
-fun DefaultButton(
-    modifier: Modifier = Modifier,
-    text: String,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .padding(12.dp),
-        elevation = ButtonDefaults.elevation(),
-        shape = RoundedCornerShape(4.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.colorPrimaryDark))
-    ) {
-        Text(
-            text = text,
-            style = typography.body2.copy(color = Color.White, fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.padding(8.dp)
-        )
-    }
-}
