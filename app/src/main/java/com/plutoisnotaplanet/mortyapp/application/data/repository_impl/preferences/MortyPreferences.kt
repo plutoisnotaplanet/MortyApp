@@ -5,17 +5,17 @@ import android.content.SharedPreferences
 import com.plutoisnotaplanet.mortyapp.application.Constants
 import javax.inject.Inject
 
-class Preferences @Inject constructor(
+class MortyPreferences @Inject constructor(
     context: Context
 ) {
 
     companion object {
-        private const val USER_ID = "user_id"
-        private const val LOGIN = "login"
+        private const val EMAIL = "login"
         private const val PASSWORD = "password"
 
         private const val IS_LOGGED = "is_logged"
-
+        private const val IS_FILTERS_LOCAL = "is_filters_local"
+        private const val SHOULD_USE_GRID_FOR_CHARACTERS = "should_use_grid_for_characters"
     }
 
     private var preferences: SharedPreferences =
@@ -23,13 +23,18 @@ class Preferences @Inject constructor(
 
     private val editor: SharedPreferences.Editor = preferences.edit()
 
-    var userId: Long by sharedPreferences(preferences, USER_ID, 0)
-    var login: String by sharedPreferences(preferences, LOGIN, "")
+    var email: String by sharedPreferences(preferences, EMAIL, "")
     var password: String by sharedPreferences(preferences, PASSWORD, "")
     var isLogged: Boolean by sharedPreferences(preferences, IS_LOGGED, false)
+    var isFiltersLocal: Boolean by sharedPreferences(preferences, IS_FILTERS_LOCAL, false)
+    var shouldUseGridForCharacters: Boolean by sharedPreferences(preferences, SHOULD_USE_GRID_FOR_CHARACTERS, false)
 
     fun logout() {
-        editor.remove(IS_LOGGED)
+        editor.apply {
+            remove(IS_LOGGED)
+            remove(IS_FILTERS_LOCAL)
+            remove(SHOULD_USE_GRID_FOR_CHARACTERS)
+        }
         editor.commit()
     }
 }

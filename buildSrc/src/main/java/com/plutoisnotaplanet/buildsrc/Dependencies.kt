@@ -11,6 +11,8 @@ object Dependencies {
 
     const val startup = "androidx.startup:startup-runtime:1.1.1"
 
+    const val permissions = "com.markodevcic:peko:2.2.0"
+
     object GoogleServices {
         const val core = "com.google.gms:google-services:4.3.13"
         const val platformBom = "com.google.firebase:firebase-bom:31.0.1"
@@ -88,7 +90,7 @@ object Dependencies {
         }
 
         object Compose {
-            const val version = "1.2.1"
+            const val version = "1.3.0"
 
             const val compilerVersion = "1.3.2"
             const val activityComposeVersion = "1.6.0"

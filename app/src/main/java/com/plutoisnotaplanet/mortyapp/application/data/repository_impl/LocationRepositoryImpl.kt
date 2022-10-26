@@ -2,7 +2,7 @@ package com.plutoisnotaplanet.mortyapp.application.data.repository_impl
 
 import com.plutoisnotaplanet.mortyapp.application.data.rest.Api
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Location
-import com.plutoisnotaplanet.mortyapp.application.domain.model.NetworkResponse
+import com.plutoisnotaplanet.mortyapp.application.domain.model.Response
 import com.plutoisnotaplanet.mortyapp.application.domain.repository.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +15,7 @@ class LocationRepositoryImpl @Inject constructor(
 ): LocationRepository {
 
 
-    override fun loadLocations(pageId: Int): Flow<NetworkResponse<List<Location>>> {
+    override fun loadLocations(pageId: Int): Flow<Response<List<Location>>> {
         return flow {
 
             try {
@@ -23,27 +23,27 @@ class LocationRepositoryImpl @Inject constructor(
 
                 val locationsListDto = response.results
                 emit(
-                    NetworkResponse.Success(
+                    Response.Success(
                         locationsListDto.map { dto ->
                             dto.toModel()
                         }
                     )
                 )
             } catch (e: Exception) {
-                emit(NetworkResponse.Error(e.message))
+                emit(Response.Error(e))
             }
         }
             .flowOn(Dispatchers.IO)
     }
 
-    override fun loadLocation(locationId: Long): Flow<NetworkResponse<Location>> {
+    override fun loadLocation(locationId: Long): Flow<Response<Location>> {
         return flow {
             try {
                 val response = api.fetchLocation(locationId)
 
-                emit(NetworkResponse.Success(response.toModel()))
+                emit(Response.Success(response.toModel()))
             } catch (e: Exception) {
-                emit(NetworkResponse.Error(e.message))
+                emit(Response.Error(e))
             }
         }
             .flowOn(Dispatchers.IO)

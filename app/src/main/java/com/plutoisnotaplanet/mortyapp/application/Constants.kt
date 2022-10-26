@@ -2,6 +2,8 @@ package com.plutoisnotaplanet.mortyapp.application
 
 object Constants {
 
+    const val FILE_PROVIDER_AUTHORITY = "com.plutoisnotaplanet.mortyapp.fileprovider"
+
     const val BASE_URL = "https://rickandmortyapi.com/api/"
 
     const val APP_ID = "MortyApp"

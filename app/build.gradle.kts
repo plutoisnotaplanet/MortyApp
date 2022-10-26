@@ -87,6 +87,9 @@ dependencies {
     implementation (Dependencies.GoogleServices.analytics)
     implementation (Dependencies.GoogleServices.auth)
 
+    //permissions
+    implementation (Dependencies.permissions)
+
     //image loading
     implementation (Dependencies.Coil.landscapist)
 

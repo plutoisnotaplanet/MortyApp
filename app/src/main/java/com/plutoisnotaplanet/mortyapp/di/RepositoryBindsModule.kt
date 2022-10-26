@@ -1,9 +1,6 @@
 package com.plutoisnotaplanet.mortyapp.di
 
-import com.plutoisnotaplanet.mortyapp.application.data.repository_impl.AuthRepositoryImpl
-import com.plutoisnotaplanet.mortyapp.application.data.repository_impl.CharactersRepositoryImpl
-import com.plutoisnotaplanet.mortyapp.application.data.repository_impl.EpisodeRepositoryImpl
-import com.plutoisnotaplanet.mortyapp.application.data.repository_impl.LocationRepositoryImpl
+import com.plutoisnotaplanet.mortyapp.application.data.repository_impl.*
 import com.plutoisnotaplanet.mortyapp.application.domain.repository.AuthRepository
 import com.plutoisnotaplanet.mortyapp.application.domain.repository.CharactersRepository
 import com.plutoisnotaplanet.mortyapp.application.domain.repository.EpisodeRepository
@@ -33,4 +30,8 @@ interface RepositoryBindsModule {
     @Binds
     @ViewModelScoped
     fun bindAuthRepository(authRepositoryImpl: AuthRepositoryImpl): AuthRepository
+
+    @Binds
+    @ViewModelScoped
+    fun bindProfileRepository(profileRepositoryImpl: ProfileRepositoryImpl): ProfileRepository
 }

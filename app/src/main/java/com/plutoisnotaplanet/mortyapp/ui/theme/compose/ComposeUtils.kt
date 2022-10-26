@@ -53,7 +53,6 @@ fun StaggeredGrid(
     ) { measurables: List<Measurable>, constraints: Constraints ->
 
         val constraintMaxWidth = constraints.maxWidth
-        val constraintMaxHeight = constraints.maxHeight
 
         var maxRowWidth = 0
 
@@ -96,12 +95,6 @@ fun StaggeredGrid(
 
                 lastRowHeight = maxPlaceableHeight
 
-//                println(
-//                    "🍎 Same row->  " +
-//                            "currentWidthOfRow: $currentWidthOfRow, " +
-//                            "placeableHeight: $placeableHeight"
-//                )
-
             } else {
 
                 currentWidthOfRow = placeableWidth
@@ -117,12 +110,6 @@ fun StaggeredGrid(
                 lastRowHeight = maxPlaceableHeight
                 maxPlaceableHeight = placeableHeight
 
-//                println(
-//                    "🍏 New column-> " +
-//                            "currentWidthOfRow: $currentWidthOfRow, " +
-//                            "totalHeightOfRows: $totalHeightOfRows, " +
-//                            "placeableHeight: $placeableHeight"
-//                )
             }
 
             placeableMap[index] = Point(xPos, yPos)
@@ -133,8 +120,6 @@ fun StaggeredGrid(
         val finalHeight = (rowHeights.sumOf { it } + lastRowHeight)
             .coerceIn(constraints.minHeight.rangeTo(constraints.maxHeight))
 
-
-//        println("RowHeights: $rowHeights, finalHeight: $finalHeight")
 
         // Set the size of the layout as big as it can
         layout(maxRowWidth, finalHeight) {

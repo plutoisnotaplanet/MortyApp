@@ -16,10 +16,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStat
-import com.plutoisnotaplanet.mortyapp.application.utils.compose.CancelableChip
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.DefaultChip
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.StaggeredGrid
 import com.plutoisnotaplanet.mortyapp.ui.theme.compose.CollectAsCompose
-import com.plutoisnotaplanet.mortyapp.ui.theme.compose.ExtendedScrollingUpButton
 import com.plutoisnotaplanet.mortyapp.ui.theme.compose.SearchBar
 import com.plutoisnotaplanet.mortyapp.ui.theme.compose.SearchDisplay
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +26,8 @@ import kotlinx.coroutines.launch
 
 @OptIn(
     ExperimentalComposeUiApi::class,
-    ExperimentalAnimationApi::class, ExperimentalMaterialApi::class
+    ExperimentalAnimationApi::class,
+    ExperimentalMaterialApi::class
 )
 @Composable
 fun CharactersScreen(
@@ -57,7 +57,7 @@ fun CharactersScreen(
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
-            FiltersActionButton(
+            CharactersFloatingActionButtons(
                 filterBottomSheetState = filterBottomSheetState,
                 showFiltersDialog = { showOrHideDialog(coroutinesScope, filterBottomSheetState) },
                 isScrollUpVisible = isScrollUp,
@@ -129,7 +129,8 @@ fun CharactersScreen(
                     CharactersListScreen(
                         viewModel = viewModel,
                         lazyListState = lazyListState,
-                        selectCharacter = selectCharacter
+                        selectCharacter = selectCharacter,
+                        onHeartClick = viewModel::addOrRemoveFromFavorites
                     )
                 }
             }
@@ -144,6 +145,7 @@ fun CharactersScreen(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun SuggestionGridLayout(
     modifier: Modifier = Modifier,
@@ -151,14 +153,13 @@ private fun SuggestionGridLayout(
     onSuggestionClick: (CharacterStat) -> Unit
 ) {
     StaggeredGrid(
-        modifier = modifier.padding(4.dp)
+        modifier = modifier.padding(8.dp)
     ) {
         suggestions.forEach { suggestionModel ->
-            CancelableChip(
-                suggestion = suggestionModel,
-                onClick = {
-                    onSuggestionClick(it)
-                }
+            DefaultChip(
+                modifier = Modifier.padding(4.dp),
+                onClick = { onSuggestionClick(suggestionModel) },
+                value = suggestionModel.viewValue
             )
         }
     }

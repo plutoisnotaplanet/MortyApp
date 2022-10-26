@@ -5,7 +5,7 @@ import androidx.compose.runtime.Immutable
 @Immutable
 sealed class NavScreen(val route: String) {
 
-    object Splash: NavScreen("Splash")
+    object Splash: NavScreen("Logout")
 
     object Login: NavScreen("Login")
     object Registration: NavScreen("Registration")

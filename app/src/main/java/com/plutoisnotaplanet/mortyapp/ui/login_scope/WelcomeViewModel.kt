@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.viewModelScope
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.InputState
-import com.plutoisnotaplanet.mortyapp.application.domain.model.NetworkResponse
+import com.plutoisnotaplanet.mortyapp.application.domain.model.Response
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.AuthUseCase
 import com.plutoisnotaplanet.mortyapp.application.extensions.Extensions.launchOnIo
 import com.plutoisnotaplanet.mortyapp.ui.common.delegate.MortyViewModel
@@ -14,11 +14,9 @@ import javax.inject.Inject
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(
     private val authUseCase: AuthUseCase
-) : MortyViewModel() {
+) : MortyViewModel<LaunchState>() {
 
-    private var _uiState: MutableState<LaunchState> = mutableStateOf(LaunchState.Initialize)
-
-    val uiState: State<LaunchState> = _uiState
+    override var _uiState: MutableState<LaunchState> = mutableStateOf(LaunchState.Initialize)
 
     var loginInput by mutableStateOf("")
         private set
@@ -55,7 +53,7 @@ class WelcomeViewModel @Inject constructor(
         viewModelScope.launchOnIo {
             authUseCase.resetPassword(loginInput).collect { response ->
                 when (response) {
-                    is NetworkResponse.Error -> showSnack(response.message)
+                    is Response.Error -> showSnack(response.error.message)
                     else -> {
                         showSnack(R.string.tv_email_restore_password)
                         loginInput = ""
@@ -71,7 +69,7 @@ class WelcomeViewModel @Inject constructor(
         viewModelScope.launchOnIo {
             authUseCase.signIn(loginInput, passwordInput).collect { response ->
                 when (response) {
-                    is NetworkResponse.Error -> showSnack(response.message)
+                    is Response.Error -> showSnack(response.error.message)
                     else -> updateUiState(LaunchState.LoggedIn)
                 }
             }
@@ -82,7 +80,7 @@ class WelcomeViewModel @Inject constructor(
         viewModelScope.launchOnIo {
             authUseCase.signUp(loginInput, passwordInput).collect { response ->
                 when (response) {
-                    is NetworkResponse.Error -> showSnack(response.message)
+                    is Response.Error -> showSnack(response.error.message)
                     else -> {
                         showSnack(R.string.tv_success_sign_up)
                         loginInput = ""

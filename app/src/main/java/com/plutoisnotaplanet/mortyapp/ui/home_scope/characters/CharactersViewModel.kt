@@ -43,11 +43,11 @@ class CharactersViewModel @Inject constructor(
 
     val characterPageStateFlow: MutableStateFlow<Int> = MutableStateFlow(1)
 
-    private val _networkState: MutableState<NetworkResponse<Any>> = mutableStateOf(NetworkResponse.Loading, neverEqualPolicy())
-    val networkState: State<NetworkResponse<Any>> = _networkState
+    private val _networkState: MutableState<Response<Any>> = mutableStateOf(Response.Loading, neverEqualPolicy())
+    val networkState: State<Response<Any>> = _networkState
 
     private val newCharactersFlow = characterPageStateFlow.combine(filtersState) { page, filter ->
-        _networkState.value = NetworkResponse.Loading
+        _networkState.value = Response.Loading
         Timber.e("trigger ${page} ${filter}")
         page to filter
     }
@@ -64,7 +64,7 @@ class CharactersViewModel @Inject constructor(
 
     fun fetchNextCharactersPage() {
         Timber.e("fetch next")
-        if (_networkState.value != NetworkResponse.Loading) {
+        if (_networkState.value != Response.Loading) {
             characterPageStateFlow.value++
         }
     }
@@ -129,6 +129,14 @@ class CharactersViewModel @Inject constructor(
         searchByText(suggestion.viewValue)
     }
 
+    fun addOrRemoveFromFavorites(characterId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            charactersUseCase.addOrRemoveFavoriteCharacter(characterId)
+                .onSuccess { Timber.e("added $characterId") }
+                .onFailure { Timber.e("${it.message}") }
+        }
+    }
+
     private fun resetCharacters() {
         characterPageStateFlow.update { 1 }
         characters.value.clear()
@@ -139,13 +147,13 @@ class CharactersViewModel @Inject constructor(
             newCharactersFlow.collectLatest { response ->
                 _networkState.value = response
                 when (response) {
-                    is NetworkResponse.Success -> {
+                    is Response.Success -> {
                         _characters.value.addAll(response.data)
                     }
-                    is NetworkResponse.Error -> {
-                        Timber.e(response.message)
+                    is Response.Error -> {
+                        Timber.e(response.error.message)
                     }
-                    is NetworkResponse.Loading -> {
+                    is Response.Loading -> {
                         Timber.e("Loading")
                     }
                 }

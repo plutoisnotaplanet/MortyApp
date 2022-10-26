@@ -1,6 +1,7 @@
 package com.plutoisnotaplanet.mortyapp.application.data.rest.response
 
 import com.google.gson.annotations.SerializedName
+import com.plutoisnotaplanet.mortyapp.application.data.database.entitites.LocationEntity
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Location
 import com.plutoisnotaplanet.mortyapp.application.extensions.Extensions.toUiFormat
 import java.util.*
@@ -21,6 +22,19 @@ data class LocationDto(
     @SerializedName("created")
     val created: Date? = null
 ) {
+
+    fun toDbEntity(pageId: Int): LocationEntity {
+        return LocationEntity(
+            id ?: 0,
+            name,
+            type,
+            dimension,
+            residents,
+            url,
+            created?.toUiFormat(),
+            pageId
+        )
+    }
 
     fun toModel(): Location {
         return Location(

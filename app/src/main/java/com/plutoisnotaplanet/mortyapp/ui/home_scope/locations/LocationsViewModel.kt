@@ -7,7 +7,7 @@ import androidx.compose.runtime.neverEqualPolicy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Location
-import com.plutoisnotaplanet.mortyapp.application.domain.model.NetworkResponse
+import com.plutoisnotaplanet.mortyapp.application.domain.model.Response
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.LocationsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,8 +26,8 @@ class LocationsViewModel @Inject constructor(
 
     val locationPageStateFlow: MutableStateFlow<Int> = MutableStateFlow(1)
 
-    private val _networkState: MutableState<NetworkResponse<Any>> = mutableStateOf(NetworkResponse.Loading, neverEqualPolicy())
-    val networkState: State<NetworkResponse<Any>> = _networkState
+    private val _networkState: MutableState<Response<Any>> = mutableStateOf(Response.Loading, neverEqualPolicy())
+    val networkState: State<Response<Any>> = _networkState
 
     private val newLocationsFlow = locationPageStateFlow
         .flatMapLatest { page ->
@@ -37,7 +37,7 @@ class LocationsViewModel @Inject constructor(
         }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     fun fetchNextLocationsPage() {
-        if (_networkState.value != NetworkResponse.Loading) {
+        if (_networkState.value != Response.Loading) {
             locationPageStateFlow.value++
         }
     }
@@ -47,14 +47,14 @@ class LocationsViewModel @Inject constructor(
             newLocationsFlow.collectLatest { response ->
                 _networkState.value = response
                 when (response) {
-                    is NetworkResponse.Success -> {
+                    is Response.Success -> {
                         _locations.value.addAll(response.data)
                         _locations.value = _locations.value
                     }
-                    is NetworkResponse.Error -> {
-                        Timber.e(response.message)
+                    is Response.Error -> {
+                        Timber.e(response.error.message)
                     }
-                    is NetworkResponse.Loading -> {
+                    is Response.Loading -> {
                         Timber.e("Loading")
                     }
                 }

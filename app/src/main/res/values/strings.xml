@@ -30,10 +30,14 @@
     <string name="tv_forgot_password">Forgot password?</string>
 
     <string name="tv_scroll_up">Scroll up</string>
+    <string name="tv_photo_was_successfully_saved">Photo was successfully saved</string>
 
     <string name="tv_unknown">Unknown</string>
     <string name="tv_filter">Filter</string>
     <string name="tt_password">Password</string>
     <string name="tt_email">E-mail</string>
     <string name="tv_apply">Apply</string>
+    <string name="tv_delete_account">Delete account</string>
+    <string name="tv_error_on_open_camera">Can not open camera with unknown error</string>
+    <string name="tv_error_on_open_gallery">Unknown error on open gallery</string>
 </resources>

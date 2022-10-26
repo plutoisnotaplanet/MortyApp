@@ -1,10 +1,10 @@
 package com.plutoisnotaplanet.mortyapp.application.data.interactors
 
 import com.plutoisnotaplanet.mortyapp.R
-import com.plutoisnotaplanet.mortyapp.application.data.repository_impl.preferences.Preferences
+import com.plutoisnotaplanet.mortyapp.application.data.repository_impl.preferences.MortyPreferences
 import com.plutoisnotaplanet.mortyapp.application.domain.model.EmailValidationState
 import com.plutoisnotaplanet.mortyapp.application.domain.model.InputState
-import com.plutoisnotaplanet.mortyapp.application.domain.model.NetworkResponse
+import com.plutoisnotaplanet.mortyapp.application.domain.model.Response
 import com.plutoisnotaplanet.mortyapp.application.domain.model.PasswordValidationState
 import com.plutoisnotaplanet.mortyapp.application.domain.repository.AuthRepository
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.AuthUseCase
@@ -17,17 +17,17 @@ import javax.inject.Inject
 class AuthInteractor @Inject constructor(
     private val validationUtil: ValidationUtil,
     private val authRepository: AuthRepository,
-    private val preferences: Preferences
+    private val preferences: MortyPreferences
 ): AuthUseCase {
 
-    override fun resetPassword(email: String): Flow<NetworkResponse<Boolean>> =
+    override suspend fun resetPassword(email: String): Flow<Response<Boolean>> =
         authRepository.resetPassword(email.trim())
 
-    override fun signIn(email: String, password: String): Flow<NetworkResponse<Boolean>> =
+    override suspend fun signIn(email: String, password: String): Flow<Response<Boolean>> =
         authRepository.signIn(email.trim(), password.trim()).map { response ->
-            if (response is NetworkResponse.Success) {
+            if (response is Response.Success) {
                 preferences.apply {
-                    this.login = email
+                    this.email = email
                     this.password = password
                     this.isLogged = true
                 }
@@ -35,7 +35,7 @@ class AuthInteractor @Inject constructor(
             response
         }
 
-    override fun signUp(email: String, password: String): Flow<NetworkResponse<Boolean>> =
+    override suspend fun signUp(email: String, password: String): Flow<Response<Boolean>> =
         authRepository.signUp(email.trim(), password.trim())
 
     override fun validateLogin(text: String): Flow<InputState> =

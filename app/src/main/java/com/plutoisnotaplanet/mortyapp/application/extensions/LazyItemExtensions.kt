@@ -23,7 +23,7 @@ import timber.log.Timber
 inline fun <T> LazyGridScope.paging(
     items: List<T>,
     currentIndexFlow: StateFlow<Int>,
-    networkState: NetworkResponse<Any>,
+    networkState: Response<Any>,
     threshold: Int = 4,
     pageSize: Int = 20,
     crossinline fetch: () -> Unit,
@@ -41,7 +41,7 @@ inline fun <T> LazyGridScope.paging(
     }
 
     when (networkState) {
-        is NetworkResponse.Loading -> {
+        is Response.Loading -> {
             item {
                 if (currentIndex == 1) {
                     ShowLoader(
@@ -54,7 +54,7 @@ inline fun <T> LazyGridScope.paging(
                 }
             }
         }
-        is NetworkResponse.Error -> {
+        is Response.Error -> {
             item {
                 if (currentIndex == 1) {
                     ShowError(
@@ -63,14 +63,14 @@ inline fun <T> LazyGridScope.paging(
                 }
             }
         }
-        is NetworkResponse.Success -> {}
+        is Response.Success -> {}
     }
 }
 
 inline fun <T> LazyListScope.paging(
     items: List<T>,
     currentIndexFlow: StateFlow<Int>,
-    networkState: NetworkResponse<Any>,
+    networkState: Response<Any>,
     threshold: Int = 4,
     pageSize: Int = 20,
     filtersModel: CharactersFilterModel = CharactersFilterModel(),
@@ -79,8 +79,6 @@ inline fun <T> LazyListScope.paging(
     crossinline itemContent: @Composable LazyItemScope.(item: T) -> Unit,
 ) {
     val currentIndex = currentIndexFlow.value.takeIf { it != 1 } ?: 2
-
-    Timber.e("trigger new list ${items.size}")
 
     if (filtersModel.isFiltersActive) {
         item {
@@ -94,15 +92,13 @@ inline fun <T> LazyListScope.paging(
 
         itemContent(item)
 
-        Timber.e("${index + threshold + 1} >= ${pageSize * (currentIndex - 1)}")
-
         if ((index + threshold + 1) >= pageSize * (currentIndex - 1)) {
             fetch()
         }
     }
 
         when (networkState) {
-            is NetworkResponse.Loading -> {
+            is Response.Loading -> {
                 item {
                     if (currentIndex == 2) {
                         ShowLoader(
@@ -115,7 +111,7 @@ inline fun <T> LazyListScope.paging(
                     }
                 }
             }
-            is NetworkResponse.Error -> {
+            is Response.Error -> {
                 item {
                     if (currentIndex == 1) {
                         ShowError(
@@ -124,7 +120,7 @@ inline fun <T> LazyListScope.paging(
                     }
                 }
             }
-            is NetworkResponse.Success -> {}
+            is Response.Success -> {}
     }
 }
 

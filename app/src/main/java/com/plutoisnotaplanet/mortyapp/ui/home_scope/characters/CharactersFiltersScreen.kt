@@ -2,20 +2,15 @@ package com.plutoisnotaplanet.mortyapp.ui.home_scope.characters
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.plutoisnotaplanet.mortyapp.R
-import com.plutoisnotaplanet.mortyapp.application.utils.compose.ChipGroup
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.FiltersChipGroup
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.DefaultClickableText
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.SubTitle14
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.Title24
@@ -78,7 +73,7 @@ fun CharactersFilterScreen(
         title = stringResource(id = R.string.tt_filter_by_status)
     )
 
-    ChipGroup(
+    FiltersChipGroup(
         chips = statusesList,
         selectedChip = currentFilter.status,
         onSelectedChanged = { status ->
@@ -92,7 +87,7 @@ fun CharactersFilterScreen(
         title = stringResource(id = R.string.tt_filter_by_gender)
     )
 
-    ChipGroup(
+    FiltersChipGroup(
         chips = genderList,
         selectedChip = currentFilter.gender,
         onSelectedChanged = { gender ->
@@ -106,7 +101,7 @@ fun CharactersFilterScreen(
         title = stringResource(id = R.string.tt_filter_by_specie)
     )
 
-    ChipGroup(
+    FiltersChipGroup(
         chips = speciesList,
         selectedChip = currentFilter.species,
         onSelectedChanged = { specie ->

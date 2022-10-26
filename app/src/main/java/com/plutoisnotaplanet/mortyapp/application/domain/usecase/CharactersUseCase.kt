@@ -8,10 +8,13 @@ interface CharactersUseCase {
     fun getCharacters(
         pageId: Int,
         filterModel: CharactersFilterModel? = null
-    ): Flow<NetworkResponse<List<Character>>>
+    ): Flow<Response<List<Character>>>
 
     fun getCharacterById(
         id: Long
-    ): Flow<NetworkResponse<Character>>
+    ): Flow<Response<Character>>
 
+    suspend fun addOrRemoveFavoriteCharacter(
+        characterId: Long
+    ): Response<Unit>
 }

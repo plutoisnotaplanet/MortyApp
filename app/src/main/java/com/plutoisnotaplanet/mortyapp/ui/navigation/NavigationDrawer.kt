@@ -28,51 +28,46 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plutoisnotaplanet.mortyapp.R
+import com.plutoisnotaplanet.mortyapp.application.domain.model.UserProfile
+import com.plutoisnotaplanet.mortyapp.ui.theme.compose.AvatarImage
 
 
 @Composable
 fun DrawerContent(
-    gradientColors: List<Color> = listOf(
-        colorResource(id = R.color.colorAccent),
-        colorResource(id = R.color.colorPrimaryDark)
-    ),
+    userProfile: UserProfile,
     itemClick: (String) -> Unit
 ) {
 
-    val itemsList = NavigationDrawerItem.values()
+    val itemsList = NavigationDrawerItem.values().dropLast(1)
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(colors = gradientColors)),
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        colorResource(id = R.color.colorAccent),
+                        colorResource(id = R.color.colorPrimaryDark)
+                    )
+                )
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(vertical = 36.dp)
+        contentPadding = PaddingValues(vertical = 36.dp),
+        userScrollEnabled = false
     ) {
 
         item {
 
-            Image(
-                modifier = Modifier
-                    .size(size = 120.dp)
-                    .clip(shape = CircleShape),
-                imageVector = Icons.Filled.AccountCircle,
-                contentDescription = "Profile Image"
+            AvatarImage(
+                avatar = userProfile.photoData?.photoUri ?: Icons.Filled.AccountCircle,
+                onClick = { itemClick(NavigationDrawerItem.ACCOUNT.route) }
             )
 
             Text(
-                modifier = Modifier
-                    .padding(top = 12.dp),
-                text = "Hermione",
-                fontSize = 26.sp,
+                modifier = Modifier.padding(top = 12.dp, bottom = 30.dp),
+                text = if (!userProfile.email.isNullOrBlank()) userProfile.email else "No email",
                 fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-
-            Text(
-                modifier = Modifier.padding(top = 8.dp, bottom = 30.dp),
-                text = "hermione@email.com",
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp,
+                fontSize = 20.sp,
                 color = Color.White
             )
         }
@@ -80,6 +75,13 @@ fun DrawerContent(
         items(itemsList) { item ->
             NavigationListItem(item = item) {
                 itemClick(item.route)
+            }
+        }
+        item {
+            Spacer(modifier = Modifier.height(272.dp))
+
+            NavigationListItem(item = NavigationDrawerItem.LOGOUT) {
+                itemClick(NavigationDrawerItem.LOGOUT.route)
             }
         }
     }
@@ -126,8 +128,8 @@ enum class NavigationDrawerItem(
     val image: ImageVector,
     val route: String
 ) {
-    HOME(Icons.Filled.Home, "Home"),
-    ACCOUNT(Icons.Filled.AccountBox, "Account"),
-    SETTINGS(Icons.Filled.Settings, "Settings"),
-    LOGOUT(Icons.Filled.ExitToApp, "Logout")
+    HOME(Icons.Filled.Home, NavScreen.NavHomeScope.route),
+    ACCOUNT(Icons.Filled.AccountBox, NavScreen.Account.route),
+    SETTINGS(Icons.Filled.Settings, NavScreen.Settings.route),
+    LOGOUT(Icons.Filled.ExitToApp, NavScreen.Splash.route)
 }

@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,50 +28,26 @@ import com.plutoisnotaplanet.mortyapp.ui.home_scope.characters.CharactersScreen
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.episodes.EpisodesScreen
 import com.plutoisnotaplanet.mortyapp.ui.home_scope.locations.LocationsScreen
 import com.plutoisnotaplanet.mortyapp.ui.main.HomeTabStateHolder
-import com.plutoisnotaplanet.mortyapp.ui.main.MainViewModel
-import com.plutoisnotaplanet.mortyapp.ui.navigation.DrawerContent
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
-import com.plutoisnotaplanet.mortyapp.ui.navigation.NavigationDrawerItem
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
 fun HomeScopeScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel,
-    mainNavController: NavHostController
+    isNavigationDrawerEnabled: (Boolean) -> Unit,
 ) {
 
     val scaffoldState = rememberScaffoldState()
-    val coroutineScope = rememberCoroutineScope()
 
     val navController = rememberNavController()
 
-    Timber.e("init homescope screen")
+    navController.addOnDestinationChangedListener { _, destination, _ ->
+        isNavigationDrawerEnabled(destination.route == NavScreen.Characters.route)
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
-        bottomBar = { BottomNavigationBar(navController) },
-        drawerContent = {
-            DrawerContent { route ->
-                when(route) {
-                    NavigationDrawerItem.LOGOUT.route -> {
-                        viewModel.logout()
-                        mainNavController.navigate(
-                            route = NavScreen.Splash.route,
-                            navOptions = NavOptions.Builder().setPopUpTo(
-                                route = NavScreen.NavHomeScope.route, inclusive = true
-                            ).build()
-                        )
-                    }
-                }
-                coroutineScope.launch {
-                    delay(150)
-                    scaffoldState.drawerState.close()
-                }
-            }
-        },
+        bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
 
         val tabStateHolder = HomeTabStateHolder(

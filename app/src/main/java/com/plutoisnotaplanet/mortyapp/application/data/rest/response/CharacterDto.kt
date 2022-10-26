@@ -2,6 +2,8 @@ package com.plutoisnotaplanet.mortyapp.application.data.rest.response
 
 import com.google.gson.annotations.SerializedName
 import com.plutoisnotaplanet.mortyapp.application.ApiConstants
+import com.plutoisnotaplanet.mortyapp.application.data.database.entitites.CharacterEntity
+import com.plutoisnotaplanet.mortyapp.application.data.database.entitites.LocationEntity
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Character
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterGender
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterSpecies
@@ -35,6 +37,24 @@ data class CharacterDto(
     @SerializedName("created")
     val created: Date? = null
 ) {
+
+    fun toDbEntity(pageId: Int): CharacterEntity {
+        return CharacterEntity(
+            id ?: 0,
+            name,
+            status.toCharacterStatus(),
+            species.toCharacterSpecie(),
+            type,
+            gender.toCharacterGender(),
+            origin?.toModel(),
+            location?.toModel(),
+            image,
+            episodes,
+            url,
+            created.toUiFormat(),
+            pageId
+        )
+    }
 
     fun toModel(): Character {
         return Character(

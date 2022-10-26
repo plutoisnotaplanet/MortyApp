@@ -2,18 +2,16 @@ package com.plutoisnotaplanet.mortyapp.ui.home_scope.characters
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,8 +23,11 @@ import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.data.rest.compose.NetworkImage
 import com.plutoisnotaplanet.mortyapp.application.domain.model.*
 import com.plutoisnotaplanet.mortyapp.application.extensions.paging
-import com.plutoisnotaplanet.mortyapp.application.utils.compose.CancelableChip
+import com.plutoisnotaplanet.mortyapp.application.utils.compose.CancellableChip
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.StaggeredGrid
+import com.plutoisnotaplanet.mortyapp.ui.theme.compose.AnimatedHeartButton
+import com.plutoisnotaplanet.mortyapp.ui.theme.compose.HeartButtonState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @Composable
 fun CharactersListScreen(
@@ -34,6 +35,7 @@ fun CharactersListScreen(
     viewModel: CharactersViewModel,
     lazyListState: LazyListState,
     selectCharacter: (Long) -> Unit,
+    onHeartClick: (Long) -> Unit
 ) {
 
     val characters by viewModel.characters
@@ -62,7 +64,8 @@ fun CharactersListScreen(
 
                 CharacterHolder(
                     character = pagingItem,
-                    selectCharacter = selectCharacter
+                    selectCharacter = selectCharacter,
+                    onHeartClick = onHeartClick
                 )
 
             }
@@ -71,44 +74,49 @@ fun CharactersListScreen(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@Preview
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun CharacterHolder(
     modifier: Modifier = Modifier,
     character: Character = Character(),
-    selectCharacter: (Long) -> Unit,
+    selectCharacter: (Long) -> Unit = {},
+    onHeartClick: (Long) -> Unit = {},
 ) {
     Surface(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .height(164.dp)
+            .fillMaxWidth()
+            .clickable { selectCharacter(character.id) },
+        elevation = 4.dp,
+        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
         color = Color.White
     ) {
+        Row {
 
-        Card(
-            modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-                .clip(RoundedCornerShape(corner = CornerSize(8.dp)))
-                .height(156.dp)
-                .fillMaxWidth(),
-            elevation = 8.dp,
-            backgroundColor = MaterialTheme.colors.background,
-            onClick = { selectCharacter(character.id) }
-        ) {
+            NetworkImage(
+                imageUrl = character.image,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.4f)
+            )
 
-            Row {
-                NetworkImage(
-                    imageUrl = character.image,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(0.4f)
-                )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
+                val heartButtonState = remember {
+                    mutableStateOf(if (character.isFavorite) HeartButtonState.ACTIVE else HeartButtonState.IDLE)
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-
                     Text(
                         text = character.name ?: stringResource(id = R.string.tv_unknown),
                         style = MaterialTheme.typography.h6,
@@ -116,23 +124,35 @@ fun CharacterHolder(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-
-                    CharacterStatus(character = character)
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    CharacterInfoField(
-                        title = stringResource(id = R.string.tt_last_known_location),
-                        value = character.location?.name ?: stringResource(id = R.string.tv_unknown)
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    CharacterInfoField(
-                        title = stringResource(id = R.string.tt_first_seen_in),
-                        value = character.origin?.name ?: stringResource(id = R.string.tv_unknown)
+                    AnimatedHeartButton(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        buttonState = heartButtonState,
+                        onToggle = {
+                            onHeartClick(character.id)
+                            character.isFavorite = !character.isFavorite
+                            heartButtonState.value =
+                                if (heartButtonState.value == HeartButtonState.IDLE) HeartButtonState.ACTIVE else HeartButtonState.IDLE
+                        },
+                        iconSize = 30.dp,
+                        expandIconSize = 38.dp
                     )
                 }
+
+                CharacterStatus(character = character)
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                CharacterInfoField(
+                    title = stringResource(id = R.string.tt_last_known_location),
+                    value = character.location?.name ?: stringResource(id = R.string.tv_unknown)
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                CharacterInfoField(
+                    title = stringResource(id = R.string.tt_first_seen_in),
+                    value = character.origin?.name ?: stringResource(id = R.string.tv_unknown)
+                )
             }
         }
     }
@@ -146,6 +166,13 @@ fun CharacterStatus(
         modifier = Modifier
             .fillMaxWidth()
     ) {
+
+        Canvas(
+            modifier = Modifier
+                .size(8.dp)
+                .align(Alignment.CenterVertically),
+            onDraw = { drawCircle(color = character.status.color) }
+        )
 
         Text(
             text = character.status.viewValue,
@@ -202,35 +229,23 @@ fun ActiveFilters(
     removeFilter: (CharacterStat) -> Unit,
 ) {
     StaggeredGrid(modifier = Modifier.padding(8.dp)) {
-        filters.status?.let {
-            CancelableChip(
-                suggestion = it,
-                onCancel = {
-                    removeFilter(it)
-                }
+        if (filters.status != null) {
+            CancellableChip(
+                value = filters.status.viewValue,
+                onCancel = { removeFilter(filters.status) }
             )
         }
-        filters.gender?.let {
-            CancelableChip(
-                suggestion = it,
-                onCancel = {
-                    removeFilter(it)
-                }
+        if (filters.gender != null) {
+            CancellableChip(
+                value = filters.gender.viewValue,
+                onCancel = { removeFilter(filters.gender) }
             )
         }
-        filters.species?.let {
-            CancelableChip(
-                suggestion = it,
-                onCancel = {
-                    removeFilter(it)
-                }
+        if (filters.species != null) {
+            CancellableChip(
+                value = filters.species.viewValue,
+                onCancel = { removeFilter(filters.species) }
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun previewCharacterHolder() {
-    CharacterHolder(selectCharacter = {})
 }

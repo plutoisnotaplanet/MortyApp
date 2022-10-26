@@ -1,13 +1,7 @@
 package com.plutoisnotaplanet.mortyapp.di
 
-import com.plutoisnotaplanet.mortyapp.application.data.interactors.AuthInteractor
-import com.plutoisnotaplanet.mortyapp.application.data.interactors.CharactersInteractor
-import com.plutoisnotaplanet.mortyapp.application.data.interactors.LaunchInteractor
-import com.plutoisnotaplanet.mortyapp.application.data.interactors.LocationsInteractor
-import com.plutoisnotaplanet.mortyapp.application.domain.usecase.AuthUseCase
-import com.plutoisnotaplanet.mortyapp.application.domain.usecase.CharactersUseCase
-import com.plutoisnotaplanet.mortyapp.application.domain.usecase.LaunchUseCase
-import com.plutoisnotaplanet.mortyapp.application.domain.usecase.LocationsUseCase
+import com.plutoisnotaplanet.mortyapp.application.data.interactors.*
+import com.plutoisnotaplanet.mortyapp.application.domain.usecase.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -33,4 +27,8 @@ interface UseCaseBindModule {
     @Binds
     @ViewModelScoped
     fun bindAuthUseCaseToAuthInteractor(authInteractor: AuthInteractor): AuthUseCase
+
+    @Binds
+    @ViewModelScoped
+    fun bindEditProfileUseCaseToEditProfileInteractor(editProfileInteractor: EditProfileInteractor): EditProfileUseCase
 }

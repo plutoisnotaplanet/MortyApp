@@ -42,7 +42,6 @@ fun WelcomeScreen(
 
     val welcomeTransition = updateTransition(targetState = launchState, label = null)
 
-
     BackHandler {
         when (launchState) {
             LaunchState.LoginInputs, LaunchState.RegistrationInputs -> {
