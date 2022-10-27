@@ -13,6 +13,13 @@ class EditProfileInteractor @Inject constructor(
     private val profileRepository: ProfileRepository
 ): EditProfileUseCase {
 
+    override suspend fun clearDataBase(): Response<Boolean> {
+        return runResulting {
+            profileRepository.clearDataBase()
+            true
+        }
+    }
+
     override suspend fun selfProfile(): Flow<UserProfile> {
         return profileRepository.getSelfProfile()
     }

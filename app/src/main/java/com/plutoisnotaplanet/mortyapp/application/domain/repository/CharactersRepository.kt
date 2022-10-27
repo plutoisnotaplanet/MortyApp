@@ -20,5 +20,5 @@ interface CharactersRepository {
         filterModel: CharactersFilterModel?
     ): Flow<Response<List<Character>>>
 
-    suspend fun addOrRemoveFavoriteCharacter(characterId: Long)
+    suspend fun addOrRemoveFavoriteCharacter(character: Character)
 }

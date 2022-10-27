@@ -16,7 +16,7 @@ import com.plutoisnotaplanet.mortyapp.application.data.database.entitites.UserPr
         CharacterEntity::class,
         LocationEntity::class,
         UserProfileEntity::class
-    ], version = 10
+    ], version = 12
 )
 @TypeConverters(Converters::class)
 abstract class MortyDataBase : RoomDatabase() {

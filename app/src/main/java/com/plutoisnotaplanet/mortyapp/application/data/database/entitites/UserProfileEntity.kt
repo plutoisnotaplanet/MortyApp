@@ -15,14 +15,20 @@ data class UserProfileEntity(
     @ColumnInfo(name = "email")
     val email: String,
     val photoData: LocalPhotoModel? = LocalPhotoModel(),
-    val favoriteCharactersList: MutableList<Character>? = mutableListOf()
+    val favoriteCharactersList: MutableList<Character>? = mutableListOf(),
+    val countOfLocalCharacters: Int = 0,
+    val countOfLocalLocations: Int = 0,
+    val countOfLocalEpisodes: Int = 0
 ) {
 
     fun toModel(): UserProfile {
         return UserProfile(
             email = email,
             photoData = photoData,
-            favoriteCharactersList = favoriteCharactersList
+            favoriteCharactersList = favoriteCharactersList,
+            countOfLocalCharacters = countOfLocalCharacters,
+            countOfLocalLocations = countOfLocalLocations,
+            countOfLocalEpisodes = countOfLocalEpisodes
         )
     }
 }

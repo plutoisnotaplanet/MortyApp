@@ -16,9 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.*
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.Title24
-import com.plutoisnotaplanet.mortyapp.ui.home_scope.characters.ActiveFilters
+import com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.characters.ActiveFilters
 import kotlinx.coroutines.flow.StateFlow
-import timber.log.Timber
 
 inline fun <T> LazyGridScope.paging(
     items: List<T>,

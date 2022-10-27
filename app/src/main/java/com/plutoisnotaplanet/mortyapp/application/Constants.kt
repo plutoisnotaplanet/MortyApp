@@ -8,6 +8,12 @@ object Constants {
 
     const val APP_ID = "MortyApp"
 
+    object DataConstants {
+        const val ALL_CHARACTERS = 846
+        const val ALL_LOCATIONS = 108
+        const val ALL_EPISODES = 41
+    }
+
     object BottomNavBarRoutes {
         const val Characters = "characters"
         const val Locations = "locations"

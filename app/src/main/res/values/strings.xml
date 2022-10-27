@@ -40,4 +40,16 @@
     <string name="tv_delete_account">Delete account</string>
     <string name="tv_error_on_open_camera">Can not open camera with unknown error</string>
     <string name="tv_error_on_open_gallery">Unknown error on open gallery</string>
+    <string name="tv_empty_email">No email</string>
+    <string name="tt_email_dots">E-mail:</string>
+    <string name="tt_database_data">DataBase data</string>
+    <string name="tt_uploaded_slash_all">Uploaded/All</string>
+    <string name="tt_favorite_characters">Favorite characters:</string>
+    <string name="tt_change_email">Change E-mail</string>
+    <string name="tt_change_password">Change password</string>
+    <string name="tt_delete_account">Delete account</string>
+
+    <string name="tv_data_with_slash">%1s/%2s</string>
+    <string name="tv_clear_database_description">Are you sure you want to clear the database?</string>
+    <string name="tt_clear_database">Clear database</string>
 </resources>

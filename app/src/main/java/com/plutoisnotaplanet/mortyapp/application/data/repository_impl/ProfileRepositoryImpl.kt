@@ -26,6 +26,17 @@ class ProfileRepositoryImpl @Inject constructor(
     private val dataBase: MortyDataBase
         get() = dbFindHelper.getDatabase()
 
+    override suspend fun clearDataBase() {
+        dataBase.charactersDao.deleteAll()
+        dataBase.locationsDao.deleteAll()
+        dataBase.userProfileDao.getProfileByEmail(preferences.email).copy(
+            countOfLocalCharacters = 0,
+            countOfLocalEpisodes = 0,
+            countOfLocalLocations = 0,
+            favoriteCharactersList = mutableListOf()
+        ).let { dataBase.userProfileDao.save(it) }
+    }
+
     override suspend fun getSelfProfile(): Flow<UserProfile> {
         return if (dataBase.userProfileDao.hasProfile(preferences.email)) {
             dataBase.userProfileDao.getProfileByEmailFlow(preferences.email).map { it.toModel() }

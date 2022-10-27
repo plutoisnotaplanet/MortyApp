@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface EditProfileUseCase {
 
+    suspend fun clearDataBase(): Response<Boolean>
+
     suspend fun selfProfile(): Flow<UserProfile>
 
     suspend fun getInputUriForPhoto(): Response<Uri>

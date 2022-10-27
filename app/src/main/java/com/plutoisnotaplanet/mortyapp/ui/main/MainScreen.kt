@@ -1,21 +1,28 @@
 package com.plutoisnotaplanet.mortyapp.ui.main
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.plutoisnotaplanet.mortyapp.application.domain.model.UserProfile
-import com.plutoisnotaplanet.mortyapp.ui.drawer_scope.AccountScreen
-import com.plutoisnotaplanet.mortyapp.ui.home_scope.HomeScopeScreen
-import com.plutoisnotaplanet.mortyapp.ui.login_scope.WelcomeScreen
+import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseUiViewState
+import com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account.AccountScreen
+import com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account.SettingsScreen
+import com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.HomeScopeScreen
+import com.plutoisnotaplanet.mortyapp.ui.screens.welcome_scope.WelcomeScreen
 import com.plutoisnotaplanet.mortyapp.ui.navigation.DrawerContent
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavigationDrawerItem
@@ -24,12 +31,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
 
-    val uiEvent by viewModel.uiEventFlow.collectAsState(initial = MainUiAction.Initialize)
+    val uiEvent by viewModel.uiState
 
     val selfProfile by viewModel.selfProfile
 
@@ -38,9 +46,18 @@ fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
     val snackBarController = SnackbarController(coroutineScope)
 
-    when(uiEvent) {
-        is MainUiAction.ShowSnackBarString -> {
-            snackBarController.showSnackbar(scaffoldState, (uiEvent as MainUiAction.ShowSnackBarString).message)
+    when (uiEvent) {
+        is BaseUiViewState.ShowStringSnack -> {
+            snackBarController.showSnackbar(
+                scaffoldState,
+                (uiEvent as BaseUiViewState.ShowStringSnack).message
+            )
+        }
+        is BaseUiViewState.ShowResourceSnack -> {
+            snackBarController.showSnackbar(
+                scaffoldState,
+                stringResource(id = (uiEvent as BaseUiViewState.ShowResourceSnack).message)
+            )
         }
         else -> {}
     }
@@ -49,13 +66,55 @@ fun MainScreen(
         mutableStateOf(false)
     }
 
+    val drawerOffset = scaffoldState.drawerState.offset
+
+    val mainTransition =
+        updateTransition(targetState = drawerOffset.value, label = "mainTransition")
+
+    val scale = 1.0207939f
+
+    val scaleScaffold by mainTransition.animateFloat(
+        transitionSpec = { tween(durationMillis = 10) },
+        label = "scaffoldScale",
+        targetValueByState = { offset ->
+            val current = -offset/1058
+            val diff = (scale - current)
+            val result = scale - diff + 1f
+            Timber.e("result: ${result} scale $scale current $current diff $diff")
+            result
+        }
+    )
+
+    val xEnd = 36f
+
+    val scaffoldXPos by mainTransition.animateFloat(
+        transitionSpec = { tween(durationMillis = 10) },
+        label = "scaffoldXPos",
+        targetValueByState = { offset ->
+            val current = -offset/30
+            xEnd - current
+        }
+    )
+
+    val yEnd = -36f
+
+    val scaffoldYPos by mainTransition.animateFloat(
+        transitionSpec = { tween(durationMillis = 10) },
+        label = "scaffoldYPos",
+        targetValueByState = { offset ->
+            val current = offset/30
+            yEnd - current
+        }
+    )
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = scaffoldState.snackbarHostState) },
         scaffoldState = scaffoldState,
         drawerGesturesEnabled = isNavigationDrawerEnabled.value,
+        drawerShape = RoundedCornerShape(0.dp),
         drawerContent = {
             DrawerContent(selfProfile) { route ->
-                when(route) {
+                when (route) {
                     NavigationDrawerItem.LOGOUT.route -> {
                         viewModel.logout()
                         coroutineScope.launch {
@@ -83,18 +142,15 @@ fun MainScreen(
         },
         content = { padding ->
             Navigation(
-                modifier = Modifier.padding(padding),
+                modifier = Modifier
+                    .padding(padding),
                 navController = navController,
                 viewModel = viewModel,
                 isNavigationDrawerEnabled = { isEnabled ->
-                Timber.e("isNav $isEnabled")
-                    isNavigationDrawerEnabled.value = isEnabled },
-            ) { snackMessage ->
-                snackBarController.showSnackbar(
-                    scaffoldState = scaffoldState,
-                    message = snackMessage
-                )
-            }
+                    isNavigationDrawerEnabled.value = isEnabled
+                },
+                onMainAction = viewModel::handleAction
+            )
         },
         backgroundColor = Color.White // Set background color to avoid the white flashing when you switch between screens
     )
@@ -106,7 +162,7 @@ fun Navigation(
     navController: NavHostController,
     viewModel: MainViewModel,
     isNavigationDrawerEnabled: (Boolean) -> Unit,
-    showSnack: (String) -> Unit,
+    onMainAction: (MainAction) -> Unit
 ) {
 
     NavHost(
@@ -121,7 +177,7 @@ fun Navigation(
         ) {
             WelcomeScreen(
                 navHostController = navController,
-                showSnack = showSnack,
+                onMainAction = onMainAction
             ) { viewModel.isLogged }
         }
         composable(
@@ -136,6 +192,12 @@ fun Navigation(
             AccountScreen { mainAction ->
                 viewModel.handleAction(mainAction)
             }
+        }
+
+        composable(
+            route = NavScreen.Settings.route
+        ) {
+            SettingsScreen()
         }
     }
 }

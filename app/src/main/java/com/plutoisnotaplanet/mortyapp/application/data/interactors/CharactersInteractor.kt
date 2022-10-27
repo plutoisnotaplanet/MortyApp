@@ -51,9 +51,9 @@ class CharactersInteractor @Inject constructor(
         }
     }
 
-    override suspend fun addOrRemoveFavoriteCharacter(characterId: Long): Response<Unit> {
+    override suspend fun addOrRemoveFavoriteCharacter(character: Character): Response<Unit> {
         return runResulting {
-            charactersRepository.addOrRemoveFavoriteCharacter(characterId)
+            charactersRepository.addOrRemoveFavoriteCharacter(character)
         }
     }
 

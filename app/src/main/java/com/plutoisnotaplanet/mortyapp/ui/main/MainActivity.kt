@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.CompositionLocalProvider
 import com.plutoisnotaplanet.mortyapp.R
+import com.plutoisnotaplanet.mortyapp.ui.theme.MortyAppTheme
 import com.skydoves.landscapist.coil.LocalCoilImageLoader
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -24,14 +25,14 @@ class MainActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.TakePicture()) { isSuccess ->
             if (isSuccess && cameraUri?.get() != null) {
                 viewModel.savePhotoByUri(cameraUri!!.get()!!)
-            } else viewModel.showSnackBar(R.string.tv_error_on_open_camera)
+            } else viewModel.showSnack(R.string.tv_error_on_open_camera)
         }
 
     private val photoChooserLauncher =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 viewModel.savePhotoByUri(uri)
-            } else viewModel.showSnackBar(R.string.tv_error_on_open_gallery)
+            } else viewModel.showSnack(R.string.tv_error_on_open_gallery)
         }
 
     private val viewModel: MainViewModel by viewModels()
@@ -40,10 +41,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            CompositionLocalProvider(LocalCoilImageLoader provides viewModel.imageLoader) {
-
-                MainScreen(viewModel)
-
+            MortyAppTheme {
+                CompositionLocalProvider(LocalCoilImageLoader provides viewModel.imageLoader) {
+                    MainScreen(viewModel)
+                }
             }
         }
         observeSingleLiveEvent()

@@ -15,8 +15,11 @@ import com.plutoisnotaplanet.mortyapp.application.domain.usecase.EditProfileUseC
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.LaunchUseCase
 import com.plutoisnotaplanet.mortyapp.application.extensions.Extensions.launchOnIo
 import com.plutoisnotaplanet.mortyapp.ui.common.SingleLiveEvent
+import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseUiViewState
+import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,14 +27,12 @@ class MainViewModel @Inject constructor(
     private val editProfileUseCase: EditProfileUseCase,
     private val launchUseCase: LaunchUseCase,
     val imageLoader: ImageLoader,
-) : ViewModel() {
+) : BaseViewModel() {
 
     val selfProfile: MutableState<UserProfile> = mutableStateOf(UserProfile(""))
 
     val mainActionEvent: SingleLiveEvent<MainSingleEvent> = SingleLiveEvent()
 
-    private val uiEvent: SingleLiveEvent<MainUiAction> = SingleLiveEvent()
-    val uiEventFlow = uiEvent.asFlow()
 
     val isLogged: Boolean
         get() = launchUseCase.isLogged
@@ -41,10 +42,17 @@ class MainViewModel @Inject constructor(
     }
 
     fun handleAction(action: MainAction) {
+        Timber.e("$action")
         when(action) {
             is MainAction.OpenCamera -> getInputUriForPhoto()
             is MainAction.OpenGalleryChooser -> {
                 mainActionEvent.postValue(MainSingleEvent.OpenGalleryChooser)
+            }
+            is MainAction.ShowStringSnack -> {
+                showSnack(action.message)
+            }
+            is MainAction.ShowResourceSnack -> {
+                showSnack(action.message)
             }
         }
     }
@@ -56,7 +64,7 @@ class MainViewModel @Inject constructor(
                     mainActionEvent.postValue(MainSingleEvent.OpenCamera(uri))
                 }
                 .onFailure { error ->
-                    showSnackBar(error.message)
+                    showSnack(error.message)
                 }
         }
     }
@@ -65,21 +73,12 @@ class MainViewModel @Inject constructor(
         viewModelScope.launchOnIo {
             editProfileUseCase.savePhotoByUri(uri)
                 .onSuccess {
-                    showSnackBar(R.string.tv_photo_was_successfully_saved)
+                    showSnack(R.string.tv_photo_was_successfully_saved)
                 }
                 .onFailure { error ->
-                    showSnackBar(error.message)
+                    showSnack(error.message)
                 }
         }
-    }
-
-    fun showSnackBar(message: String?) {
-        if (message.isNullOrBlank()) return
-        uiEvent.postValue(MainUiAction.ShowSnackBarString(message))
-    }
-
-    fun showSnackBar(messageId: Int) {
-        uiEvent.postValue(MainUiAction.ShowSnackBarRes(messageId))
     }
 
     init {

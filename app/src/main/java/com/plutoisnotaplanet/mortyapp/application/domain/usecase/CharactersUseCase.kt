@@ -15,6 +15,6 @@ interface CharactersUseCase {
     ): Flow<Response<Character>>
 
     suspend fun addOrRemoveFavoriteCharacter(
-        characterId: Long
+        character: Character
     ): Response<Unit>
 }

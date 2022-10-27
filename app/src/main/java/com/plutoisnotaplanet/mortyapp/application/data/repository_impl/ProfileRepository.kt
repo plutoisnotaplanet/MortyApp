@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
 
+    suspend fun clearDataBase()
+
     suspend fun getInputUriForPhoto(): Uri
 
     suspend fun saveAvatarByUri(uri: Uri)

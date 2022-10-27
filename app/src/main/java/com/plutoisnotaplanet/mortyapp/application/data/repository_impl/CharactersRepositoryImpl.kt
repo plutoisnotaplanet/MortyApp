@@ -19,20 +19,20 @@ class CharactersRepositoryImpl @Inject constructor(
     private val dataBase: MortyDataBase
         get() = dbFindHelper.getDatabase()
 
-    override suspend fun addOrRemoveFavoriteCharacter(characterId: Long) {
+    override suspend fun addOrRemoveFavoriteCharacter(character: Character) {
 
-        val character = dataBase.charactersDao.getCharacterById(characterId)
-        character.isFavorite = !character.isFavorite
-        dataBase.charactersDao.save(character)
+        val characterFromDb = dataBase.charactersDao.getCharacterById(character.id)
+        characterFromDb.isFavorite = !characterFromDb.isFavorite
+        dataBase.charactersDao.save(characterFromDb)
 
         val selfProfile = dataBase.userProfileDao.getProfileByEmail(preferences.email)
 
         selfProfile.copy(
             favoriteCharactersList = selfProfile.favoriteCharactersList?.apply {
-                if (contains(character.toModel())) {
-                    remove(character.toModel())
+                if (contains(character)) {
+                    remove(character)
                 } else {
-                    add(character.toModel())
+                    add(character)
                 }
             }
         ).let {
@@ -49,6 +49,9 @@ class CharactersRepositoryImpl @Inject constructor(
                     val response = api.fetchCharacters(pageId)
                     val charactersListDto = response.results
                     characters = charactersListDto.map { it.toModel() }
+
+                    updateCountOfLocalCharacters()
+
                     dataBase.charactersDao.insertAll(charactersListDto.map { it.toDbEntity(pageId) })
                 }
 
@@ -104,7 +107,10 @@ class CharactersRepositoryImpl @Inject constructor(
 
     }.flowOn(Dispatchers.IO)
 
-    override fun loadFilteredCharactersLocal(pageId: Int, filterModel: CharactersFilterModel?): Flow<Response<List<Character>>> {
+    override fun loadFilteredCharactersLocal(
+        pageId: Int,
+        filterModel: CharactersFilterModel?
+    ): Flow<Response<List<Character>>> {
         return flow {
 
             val startIndex = pageId * 20
@@ -138,4 +144,13 @@ class CharactersRepositoryImpl @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
+    private suspend fun updateCountOfLocalCharacters() {
+        val selfProfile = dataBase.userProfileDao.getProfileByEmail(preferences.email)
+        selfProfile.copy(
+            countOfLocalCharacters = dataBase.charactersDao.getAllCharacters().size
+        ).let {
+            dataBase.userProfileDao.save(it)
+        }
+
+    }
 }
