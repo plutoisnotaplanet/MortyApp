@@ -31,4 +31,15 @@ data class UserProfileEntity(
             countOfLocalEpisodes = countOfLocalEpisodes
         )
     }
+
+    fun toScreenModel(): UserProfile {
+        return UserProfile(
+            email = email,
+            photoData = photoData?.onlyUri,
+            favoriteCharactersList = favoriteCharactersList,
+            countOfLocalCharacters = countOfLocalCharacters,
+            countOfLocalLocations = countOfLocalLocations,
+            countOfLocalEpisodes = countOfLocalEpisodes
+        )
+    }
 }

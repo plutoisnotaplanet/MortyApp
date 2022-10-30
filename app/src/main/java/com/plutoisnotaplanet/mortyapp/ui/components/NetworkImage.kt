@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.application.data.rest.compose
+package com.plutoisnotaplanet.mortyapp.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize

@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.ui.common.delegate
+package com.plutoisnotaplanet.mortyapp.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plutoisnotaplanet.mortyapp.application.domain.model.BottomMenuAction
+import com.plutoisnotaplanet.mortyapp.ui.components.animations.pushedAnimation
 
 @Composable
 fun BottomMenuScreen(
@@ -41,9 +42,7 @@ fun BottomMenuItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onActionClick(action)
-            }
+            .pushedAnimation { (onActionClick(action)) }
             .padding(horizontal = 24.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

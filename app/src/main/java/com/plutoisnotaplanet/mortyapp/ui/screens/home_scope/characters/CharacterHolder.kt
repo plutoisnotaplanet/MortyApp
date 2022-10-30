@@ -1,11 +1,8 @@
 package com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.characters
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -20,59 +17,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plutoisnotaplanet.mortyapp.R
-import com.plutoisnotaplanet.mortyapp.application.data.rest.compose.NetworkImage
+import com.plutoisnotaplanet.mortyapp.ui.components.NetworkImage
 import com.plutoisnotaplanet.mortyapp.application.domain.model.*
-import com.plutoisnotaplanet.mortyapp.application.extensions.paging
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.CancellableChip
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.StaggeredGrid
-import com.plutoisnotaplanet.mortyapp.ui.components.AnimatedHeartButton
-import com.plutoisnotaplanet.mortyapp.ui.components.HeartButtonState
+import com.plutoisnotaplanet.mortyapp.ui.components.animations.AnimatedHeartButton
+import com.plutoisnotaplanet.mortyapp.ui.components.animations.HeartButtonState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-
-@Composable
-fun CharactersListScreen(
-    modifier: Modifier = Modifier.fillMaxSize(),
-    viewModel: CharactersViewModel,
-    lazyListState: LazyListState,
-    selectCharacter: (Long) -> Unit,
-    onHeartClick: (Character) -> Unit
-) {
-
-    val characters by viewModel.characters
-    val networkState by viewModel.networkState
-    val filtersModel by viewModel.filtersState.collectAsState()
-
-    Scaffold(
-        modifier = modifier
-    ) { innerPadding ->
-
-        LazyColumn(
-            state = lazyListState,
-            modifier = modifier
-                .padding(innerPadding)
-                .background(Color.White)
-        ) {
-
-            paging(
-                items = characters,
-                filtersModel = filtersModel,
-                removeFilter = viewModel::removeFilter,
-                currentIndexFlow = viewModel.characterPageStateFlow,
-                networkState = networkState,
-                fetch = viewModel::fetchNextCharactersPage
-            ) { pagingItem ->
-
-                CharacterHolder(
-                    character = pagingItem,
-                    selectCharacter = selectCharacter,
-                    onHeartClick = onHeartClick
-                )
-
-            }
-        }
-    }
-}
-
 
 @Preview
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -89,7 +40,7 @@ fun CharacterHolder(
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .height(164.dp)
             .fillMaxWidth()
-            .clickable { selectCharacter(character.id) },
+            .clickable(onClick = { selectCharacter(character.id) }),
         elevation = 4.dp,
         shape = RoundedCornerShape(corner = CornerSize(8.dp)),
         color = Color.White
@@ -119,6 +70,7 @@ fun CharacterHolder(
                 ) {
                     Text(
                         text = character.name ?: stringResource(id = R.string.tv_unknown),
+                        modifier = Modifier.fillMaxWidth(0.8f),
                         style = MaterialTheme.typography.h6,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,

@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.ui.components
+package com.plutoisnotaplanet.mortyapp.ui.components.animations
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.animateDp
@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
@@ -89,11 +90,13 @@ private fun HeartButton(
         .offset(x = 8.dp)) {
         Icon(
             modifier = modifier
-                .clickable(
-                    onClick = onToggle
-                )
                 .width(size)
-                .height(size),
+                .height(size)
+                .clickable(
+                    interactionSource = MutableInteractionSource(),
+                    indication = null,
+                    onClick = onToggle
+                ),
             imageVector = Icons.Outlined.Favorite,
             tint = color,
             contentDescription = null

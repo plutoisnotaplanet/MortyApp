@@ -13,19 +13,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.InputState
-import com.plutoisnotaplanet.mortyapp.ui.components.DefaultButton
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.DefaultClickableText
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.DefaultInputField
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.PasswordInputField
-import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseUiViewState
+import com.plutoisnotaplanet.mortyapp.ui.components.AnimatedButton
 
 
 @Composable
 fun WelcomeInputs(
     modifier: Modifier = Modifier,
     viewModel: WelcomeViewModel,
-    welcomeTransition: Transition<BaseUiViewState>,
-    launchState: BaseUiViewState,
+    welcomeTransition: Transition<WelcomeUiState>,
+    launchState: WelcomeUiState,
     forgotPasswordClick: () -> Unit
 ) {
 
@@ -38,7 +37,7 @@ fun WelcomeInputs(
         label = "inputFieldsPos",
         targetValueByState = { state ->
             when (state) {
-                LaunchViewState.LoginInputs, LaunchViewState.RegistrationInputs, LaunchViewState.ForgotPasswordInput -> 0
+                WelcomeUiState.LoginInputs, WelcomeUiState.RegistrationInputs, WelcomeUiState.ForgotPasswordInput -> 0
                 else -> -400
             }
         })
@@ -49,7 +48,7 @@ fun WelcomeInputs(
         label = "loginInputPos",
         targetValueByState = { state ->
             when (state) {
-                LaunchViewState.ForgotPasswordInput -> -200
+                WelcomeUiState.ForgotPasswordInput -> -200
                 else -> 0
             }
         }
@@ -62,7 +61,7 @@ fun WelcomeInputs(
         label = "buttonApplyPos",
         targetValueByState = { state ->
             when (state) {
-                LaunchViewState.ForgotPasswordInput -> -120
+                WelcomeUiState.ForgotPasswordInput -> -120
                 else -> 200
             }
         })
@@ -88,7 +87,7 @@ fun WelcomeInputs(
         )
 
         AnimatedVisibility(
-            visible = launchState == LaunchViewState.LoginInputs,
+            visible = launchState == WelcomeUiState.LoginInputs,
             enter = fadeIn(animationSpec = tween(durationMillis = 50,  easing = EaseOut)),
             exit = fadeOut(animationSpec = tween(durationMillis = 50, easing = EaseOut))
         ) {
@@ -102,7 +101,7 @@ fun WelcomeInputs(
         }
 
         AnimatedVisibility(
-            visible = launchState != LaunchViewState.ForgotPasswordInput,
+            visible = launchState != WelcomeUiState.ForgotPasswordInput,
             enter = fadeIn(animationSpec = tween(durationMillis = 50,  easing = EaseOut)),
             exit = fadeOut(animationSpec = tween(durationMillis = 50, easing = EaseOut))
         ) {
@@ -110,21 +109,23 @@ fun WelcomeInputs(
                 value = viewModel.passwordInput,
                 onValueChange = viewModel::updatePassword,
                 label = stringResource(R.string.tt_password),
-                modifier = modifier.absoluteOffset(y = 100.dp + if (launchState == LaunchViewState.LoginInputs) 16.dp else 0.dp),
+                modifier = modifier.absoluteOffset(y = 100.dp + if (launchState == WelcomeUiState.LoginInputs) 16.dp else 0.dp),
                 inputState = passwordErrorState
             )
         }
 
-        DefaultButton(text = stringResource(R.string.tv_apply),
+        val isApplyBtnEnabled = if (launchState != WelcomeUiState.ForgotPasswordInput) isApplyButtonEnabled else loginErrorState is InputState.Valid
+
+        AnimatedButton(text = stringResource(R.string.tv_apply),
             modifier = modifier
                 .padding(top = 16.dp)
                 .absoluteOffset(y = buttonPos.dp),
-            enabled = if (launchState != LaunchViewState.ForgotPasswordInput) isApplyButtonEnabled else loginErrorState is InputState.Valid,
+            enabled = isApplyBtnEnabled,
             onClick = {
                 when(launchState) {
-                    LaunchViewState.LoginInputs -> viewModel.signIn()
-                    LaunchViewState.RegistrationInputs -> viewModel.signUp()
-                    LaunchViewState.ForgotPasswordInput -> viewModel.resetPassword()
+                    WelcomeUiState.LoginInputs -> viewModel.signIn()
+                    WelcomeUiState.RegistrationInputs -> viewModel.signUp()
+                    WelcomeUiState.ForgotPasswordInput -> viewModel.resetPassword()
                     else -> {}
                 }
             })

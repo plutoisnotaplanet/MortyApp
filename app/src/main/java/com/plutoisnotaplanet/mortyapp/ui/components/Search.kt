@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.ui.theme.compose
+package com.plutoisnotaplanet.mortyapp.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.R
 import kotlinx.coroutines.flow.*
+import timber.log.Timber
 
 @Composable
 fun <S> rememberSearchState(
@@ -57,20 +58,21 @@ fun <S> rememberSearchState(
 }
 
 @Composable
-fun <T>SearchState<T>.CollectAsCompose(
+fun <T> SearchState<T>.collectAsCompose(
     debounce: Long,
     onQueryResult: (TextFieldValue) -> Unit
-    ) =
+) =
     this.also { state ->
         LaunchedEffect(key1 = Unit) {
-
             snapshotFlow { state.query }
                 .distinctUntilChanged()
                 .filter { query: TextFieldValue ->
+                    Timber.e("trying fitler ${query.text} previous ${state.previousQueryText}")
                     query.text.isNotEmpty() && !state.sameAsPreviousQuery()
                 }
                 .debounce(debounce)
                 .mapLatest { query: TextFieldValue ->
+                    state.previousQueryText = query.text
                     onQueryResult(query)
                 }
                 .collect()
@@ -130,7 +132,6 @@ fun SearchBar(
  * and clear and loading [IconButton]s to clear query or show progress indicator when
  * a query is in progress.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchTextField(
     query: TextFieldValue,

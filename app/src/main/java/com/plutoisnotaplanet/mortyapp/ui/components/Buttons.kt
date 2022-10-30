@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.ui.components.animations.pushedAnimation
+import timber.log.Timber
 
 
 @Preview
@@ -56,15 +57,16 @@ fun DefaultButton(
 
 @Composable
 fun AnimatedButton(
-    modifier: Modifier,
-    text: String,
-    textColor: Color,
-    backgroundColor: Color,
-    onClick: () -> Unit
+    modifier: Modifier = Modifier,
+    text: String = stringResource(id = R.string.tv_unknown),
+    textColor: Color = Color.White,
+    backgroundColor: Color = MaterialTheme.colors.primary,
+    enabled: Boolean = true,
+    onClick: () -> Unit = {}
 ) {
-
     Button(
         onClick = onClick,
+        enabled = enabled,
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = backgroundColor
@@ -75,6 +77,7 @@ fun AnimatedButton(
             .fillMaxWidth()
             .pushedAnimation(onClick = onClick)
     ) {
+        Timber.e("animated button compose $text")
         Text(
             text = text,
             style = MaterialTheme.typography.h6,

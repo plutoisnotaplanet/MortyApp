@@ -16,6 +16,7 @@ import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.UserProfile
 import com.plutoisnotaplanet.mortyapp.ui.components.animations.pushedAnimation
 import com.plutoisnotaplanet.mortyapp.ui.components.AvatarImage
+import timber.log.Timber
 
 @Preview
 @Composable
@@ -25,13 +26,14 @@ fun AccountAvatar(
     onClick: () -> Unit = {}
 ) {
     ConstraintLayout(modifier = modifier.fillMaxWidth()) {
+        Timber.e("avatar compose")
 
         val (profileImage, addPhotoBtn) = createRefs()
 
         AvatarImage(
             modifier = Modifier
                 .constrainAs(profileImage) {
-                    top.linkTo(parent.top, margin = 32.dp)
+                    top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },

@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStat
+import com.plutoisnotaplanet.mortyapp.ui.theme.light_primary
 
 //@Composable
 //fun CancelableChip(
@@ -159,7 +160,7 @@ fun SelectableChip(
         modifier = modifier,
         elevation = 4.dp,
         shape = MaterialTheme.shapes.medium.copy(CornerSize(percent = 15)),
-        color = if (isSelected) colorResource(id = R.color.colorPrimary) else colorResource(id = R.color.colorAccent)
+        color = if (isSelected) light_primary else Color.Gray
     ) {
         Row(modifier = Modifier
             .toggleable(

@@ -10,41 +10,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.BottomMenuAction
 import com.plutoisnotaplanet.mortyapp.application.domain.model.UserProfile
-import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseUiViewState
-import com.plutoisnotaplanet.mortyapp.ui.common.base.loadSnackBar
+import com.plutoisnotaplanet.mortyapp.ui.common.base.prepareSnackBars
 import com.plutoisnotaplanet.mortyapp.ui.components.AnimatedButton
-import com.plutoisnotaplanet.mortyapp.ui.common.delegate.BottomMenuScreen
-import com.plutoisnotaplanet.mortyapp.ui.main.MainAction
+import com.plutoisnotaplanet.mortyapp.ui.components.BottomMenuScreen
+import com.plutoisnotaplanet.mortyapp.ui.main.MainEvent
+import com.plutoisnotaplanet.mortyapp.ui.screens.MenuTopBar
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterialApi::class)
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun AccountScreen(
     modifier: Modifier = Modifier,
     viewModel: AccountViewModel = hiltViewModel(),
-    onMainAction: (MainAction) -> Unit = {}
+    onMainEvent: (MainEvent) -> Unit = {}
 ) {
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.singleAction.prepareSnackBars(onMainEvent)
+    }
+
     val coroutineScope = rememberCoroutineScope()
+
     var userProfile by remember {
         mutableStateOf(UserProfile())
     }
 
     val uiState by viewModel.uiState
-    uiState.loadSnackBar(onMainAction)
 
     when (uiState) {
-        is AccountUiViewState.SelfProfileViewState -> {
-            userProfile = (uiState as AccountUiViewState.SelfProfileViewState).userProfile
+        is AccountUiState.SelfProfileUiState -> {
+            userProfile = (uiState as AccountUiState.SelfProfileUiState).userProfile
         }
+        else -> {}
     }
 
     val menuBottomSheetState = rememberModalBottomSheetState(
@@ -61,10 +63,14 @@ fun AccountScreen(
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
 
             item {
+                MenuTopBar(onActionClick = { onMainEvent(MainEvent.OpenDrawerMenu) })
+            }
+
+            item {
                 AccountAvatar(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 36.dp),
+                        .padding(top = 16.dp),
                     userProfile = userProfile,
                     onClick = { coroutineScope.launch { menuBottomSheetState.show() } }
                 )
@@ -135,13 +141,13 @@ fun AccountScreen(
                 BottomMenuScreen(
                     actionsList = viewModel.menuActionsList(userProfile.photoData?.photoUri != null)
                 ) { action ->
+                    when (action) {
+                        BottomMenuAction.OpenGallery -> onMainEvent(MainEvent.OpenGalleryChooser)
+                        BottomMenuAction.OpenCamera -> onMainEvent(MainEvent.OpenCamera)
+                        BottomMenuAction.DeletePhoto -> viewModel.deleteAvatar()
+                    }
                     coroutineScope.launch {
                         menuBottomSheetState.hide()
-                    }
-                    when (action) {
-                        BottomMenuAction.OpenGallery -> onMainAction(MainAction.OpenGalleryChooser)
-                        BottomMenuAction.OpenCamera -> onMainAction(MainAction.OpenCamera)
-                        BottomMenuAction.DeletePhoto -> viewModel.deleteAvatar()
                     }
                 }
             },

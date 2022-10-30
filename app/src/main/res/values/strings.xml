@@ -38,8 +38,9 @@
     <string name="tt_email">E-mail</string>
     <string name="tv_apply">Apply</string>
     <string name="tv_delete_account">Delete account</string>
-    <string name="tv_error_on_open_camera">Can not open camera with unknown error</string>
-    <string name="tv_error_on_open_gallery">Unknown error on open gallery</string>
+    <string name="tv_error_on_open_camera">Can not open camera</string>
+    <string name="tv_error_on_open_gallery">Can not open gallery</string>
+    <string name="tv_error_on_saving_photo">Can not save photo</string>
     <string name="tv_empty_email">No email</string>
     <string name="tt_email_dots">E-mail:</string>
     <string name="tt_database_data">DataBase data</string>
@@ -52,4 +53,5 @@
     <string name="tv_data_with_slash">%1s/%2s</string>
     <string name="tv_clear_database_description">Are you sure you want to clear the database?</string>
     <string name="tt_clear_database">Clear database</string>
+    <string name="tv_success_db_clear">Database successfully cleared</string>
 </resources>

@@ -28,21 +28,18 @@ import com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.characters.Character
 import com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.episodes.EpisodesScreen
 import com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.locations.LocationsScreen
 import com.plutoisnotaplanet.mortyapp.ui.main.HomeTabStateHolder
+import com.plutoisnotaplanet.mortyapp.ui.main.MainEvent
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
 
 @Composable
 fun HomeScopeScreen(
     modifier: Modifier = Modifier,
-    isNavigationDrawerEnabled: (Boolean) -> Unit,
+    onMainEvent: (MainEvent) -> Unit
 ) {
 
     val scaffoldState = rememberScaffoldState()
 
     val navController = rememberNavController()
-
-    navController.addOnDestinationChangedListener { _, destination, _ ->
-        isNavigationDrawerEnabled(destination.route == NavScreen.Characters.route)
-    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -63,7 +60,8 @@ fun HomeScopeScreen(
                 ) {
                     CharactersScreen(
                         viewModel = hiltViewModel(),
-                        lazyListState = tabStateHolder.charactersLazyListState
+                        lazyListState = tabStateHolder.charactersLazyListState,
+                        onMainEvent = onMainEvent
                     ) { characterId ->
                         navController.navigate("${NavScreen.CharacterDetails.route}/$characterId")
                     }

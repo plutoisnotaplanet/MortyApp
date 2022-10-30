@@ -2,10 +2,6 @@ package com.plutoisnotaplanet.mortyapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF6200EE)
-val Purple700 = Color(0xFF3700B3)
-val Teal200 = Color(0xFF03DAC5)
 val shimmerHighLight = Color(0xA3C2C2C2)
 
 val characterAlive = Color(0xFF00FF00)
@@ -16,9 +12,9 @@ val light_accent_color = Color(0x1ED81B60)
 
 val light_primary = Color(0xFFBC214B)
 val light_onPrimary = Color(0xFFffffff)
-val light_background = Color(0xFFFFFAF9)
+val light_background = Color(0xFFffffff)
 val light_onBackground = Color(0xFF211a18)
-val light_surface = Color(0xFF9E1C40)
+val light_surface = Color(0xFFffffff)
 val light_onSurface = Color(0xFF000000)
 val light_secondary = Color(0xFFD81B60)
 val light_onSecondary = Color(0xFFffffff)

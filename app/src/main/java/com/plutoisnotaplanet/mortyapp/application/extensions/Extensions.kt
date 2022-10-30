@@ -15,7 +15,5 @@ object Extensions {
         } ?: "Unknown"
     }
 
-    fun CoroutineScope.launchOnIo(block: suspend CoroutineScope.() -> Unit) = launch(Dispatchers.IO) {
-        block()
-    }
+
 }

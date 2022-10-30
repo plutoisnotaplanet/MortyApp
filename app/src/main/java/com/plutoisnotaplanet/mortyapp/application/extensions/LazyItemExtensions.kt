@@ -18,6 +18,7 @@ import com.plutoisnotaplanet.mortyapp.application.domain.model.*
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.Title24
 import com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.characters.ActiveFilters
 import kotlinx.coroutines.flow.StateFlow
+import timber.log.Timber
 
 inline fun <T> LazyGridScope.paging(
     items: List<T>,
@@ -112,7 +113,7 @@ inline fun <T> LazyListScope.paging(
             }
             is Response.Error -> {
                 item {
-                    if (currentIndex == 1) {
+                    if (currentIndex == 2) {
                         ShowError(
                             modifier = Modifier.fillParentMaxSize()
                         )

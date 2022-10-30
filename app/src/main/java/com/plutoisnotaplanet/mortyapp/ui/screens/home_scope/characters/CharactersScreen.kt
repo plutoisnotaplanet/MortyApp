@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -16,26 +17,31 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.application.domain.model.CharacterStat
+import com.plutoisnotaplanet.mortyapp.application.extensions.paging
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.DefaultChip
 import com.plutoisnotaplanet.mortyapp.application.utils.compose.StaggeredGrid
-import com.plutoisnotaplanet.mortyapp.ui.theme.compose.CollectAsCompose
-import com.plutoisnotaplanet.mortyapp.ui.theme.compose.SearchBar
-import com.plutoisnotaplanet.mortyapp.ui.theme.compose.SearchDisplay
+import com.plutoisnotaplanet.mortyapp.ui.main.MainEvent
+import com.plutoisnotaplanet.mortyapp.ui.screens.MenuTopBarWithSearch
+import com.plutoisnotaplanet.mortyapp.ui.components.SearchDisplay
+import com.plutoisnotaplanet.mortyapp.ui.components.TopBarSearchState
+import com.plutoisnotaplanet.mortyapp.ui.components.collectAsCompose
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(
     ExperimentalComposeUiApi::class,
-    ExperimentalAnimationApi::class,
     ExperimentalMaterialApi::class
 )
 @Composable
 fun CharactersScreen(
+    modifier: Modifier = Modifier,
     viewModel: CharactersViewModel,
     lazyListState: LazyListState,
-    modifier: Modifier = Modifier,
+    onMainEvent: (MainEvent) -> Unit,
     selectCharacter: (Long) -> Unit,
 ) {
+
     val filterBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
@@ -43,95 +49,120 @@ fun CharactersScreen(
 
     val searchState by viewModel.searchState
 
-    val isScrollUp by derivedStateOf { lazyListState.firstVisibleItemIndex > 0 }
-
     val state =
-        searchState.CollectAsCompose(
+        searchState.collectAsCompose(
             debounce = 600,
         ) { query: TextFieldValue ->
+            Timber.e("query: ${query.text}")
             viewModel.searchByText(query.text)
         }
 
     val coroutinesScope = rememberCoroutineScope()
 
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val dispatcher: OnBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
+
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
             CharactersFloatingActionButtons(
+                lazyListState = lazyListState,
                 filterBottomSheetState = filterBottomSheetState,
                 showFiltersDialog = { showOrHideDialog(coroutinesScope, filterBottomSheetState) },
-                isScrollUpVisible = isScrollUp,
                 scrollToTop = { coroutinesScope.launch { lazyListState.animateScrollToItem(0) } }
             )
         },
-        floatingActionButtonPosition = if (isScrollUp) FabPosition.Center else FabPosition.End,
+        floatingActionButtonPosition = FabPosition.End,
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
 
-            val focusManager = LocalFocusManager.current
-            val keyboardController = LocalSoftwareKeyboardController.current
+        val characters by viewModel.characters
+        val networkState by viewModel.networkState
+        val filtersModel by viewModel.filtersState.collectAsState()
 
-            val dispatcher: OnBackPressedDispatcher =
-                LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
-
-            BackHandler(enabled = filterBottomSheetState.isVisible) {
-                showOrHideDialog(coroutinesScope, filterBottomSheetState)
-            }
-
-            BackHandler(
-                enabled = state.focused
-            ) {
-                if (!state.focused) {
-                    dispatcher.onBackPressed()
-                } else {
+        BackHandler {
+            when {
+                state.focused -> {
                     state.query = TextFieldValue("")
                     state.focused = false
                     focusManager.clearFocus()
                     keyboardController?.hide()
                 }
+                filterBottomSheetState.isVisible -> {
+                    showOrHideDialog(coroutinesScope, filterBottomSheetState)
+                }
+                state.topBarState == TopBarSearchState.SHOWING -> {
+                    state.topBarState = TopBarSearchState.HIDDEN
+                    state.query = TextFieldValue("")
+                    viewModel.clearFilters()
+                }
+                else -> dispatcher.onBackPressed()
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            state = lazyListState
+        ) {
+
+            item {
+                MenuTopBarWithSearch(
+                    query = state.query,
+                    topBarState = state.topBarState,
+                    onTopBarChangeState = { state.topBarState = it },
+                    onQueryChange = { state.query = it },
+                    onSearchFocusChange = { state.focused = it },
+                    onClearQuery = {
+                        state.query = TextFieldValue("")
+                        viewModel.updateData()
+                    },
+                    onBack = {
+                        viewModel.clearFilters()
+                        state.query = TextFieldValue("")
+                    },
+                    focused = state.focused,
+                    modifier = modifier,
+                    onOpenDrawerMenu = { onMainEvent(MainEvent.OpenDrawerMenu) }
+                )
             }
 
-            SearchBar(
-                query = state.query,
-                onQueryChange = { state.query = it },
-                onSearchFocusChange = { state.focused = it },
-                onClearQuery = {
-                    state.query = TextFieldValue("")
-                    viewModel.updateData()
-                },
-                onBack = {
-                    viewModel.clearFilters()
-                    state.query = TextFieldValue("")
-                },
-                focused = state.focused,
-                modifier = modifier
-            )
 
             when (state.searchDisplay) {
 
                 SearchDisplay.Suggestions -> {
-                    SuggestionGridLayout(
-                        suggestions = state.suggestions,
-                        onSuggestionClick = {
-                            viewModel.prepareSuggestionsClick(it)
-                            state.focused = false
-                            focusManager.clearFocus()
-                            state.query = TextFieldValue("")
-                        }
-                    )
+                    item {
+                        SuggestionGridLayout(
+                            suggestions = state.suggestions,
+                            onSuggestionClick = {
+                                viewModel.prepareSuggestionsClick(it)
+                                state.focused = false
+                                focusManager.clearFocus()
+                                state.query = TextFieldValue("")
+                            }
+                        )
+                    }
                 }
 
                 SearchDisplay.Results -> {
-                    CharactersListScreen(
-                        viewModel = viewModel,
-                        lazyListState = lazyListState,
-                        selectCharacter = selectCharacter,
-                        onHeartClick = viewModel::addOrRemoveFromFavorites
-                    )
+                    paging(
+                        items = characters,
+                        filtersModel = filtersModel,
+                        removeFilter = viewModel::removeFilter,
+                        currentIndexFlow = viewModel.characterPageStateFlow,
+                        networkState = networkState,
+                        fetch = viewModel::fetchNextCharactersPage
+                    ) { pagingItem ->
+
+                        CharacterHolder(
+                            character = pagingItem,
+                            selectCharacter = selectCharacter,
+                            onHeartClick = viewModel::addOrRemoveFromFavorites
+                        )
+                    }
                 }
             }
         }
@@ -145,7 +176,6 @@ fun CharactersScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun SuggestionGridLayout(
     modifier: Modifier = Modifier,

@@ -1,14 +1,15 @@
 package com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
+import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.BottomMenuAction
 import com.plutoisnotaplanet.mortyapp.application.domain.model.onFailure
 import com.plutoisnotaplanet.mortyapp.application.domain.model.onSuccess
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.EditProfileUseCase
-import com.plutoisnotaplanet.mortyapp.application.extensions.Extensions.launchOnIo
 import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -18,13 +19,15 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val editProfileUseCase: EditProfileUseCase
-) : BaseViewModel() {
+) : BaseViewModel<AccountUiState>() {
 
     companion object {
         val bottomMenuList = BottomMenuAction.values().toList()
     }
 
-    val menuActionsList: (Boolean) -> List<BottomMenuAction>
+    override val _uiState: MutableState<AccountUiState> = mutableStateOf(AccountUiState.Initialize)
+
+    inline val menuActionsList: (Boolean) -> List<BottomMenuAction>
         get() = { hasAvatar ->
             if (hasAvatar) {
                 bottomMenuList
@@ -34,23 +37,23 @@ class AccountViewModel @Inject constructor(
         }
 
     fun deleteAvatar() {
-        viewModelScope.launchOnIo {
+        viewModelScope.launchWithCatchOnIo {
             editProfileUseCase.deleteAvatar()
                 .onFailure { error ->
-                    Timber.e("$error")
+                    showSnack(error.message)
                 }
                 .onSuccess { Timber.e("success") }
         }
     }
 
     fun clearDataBase() {
-        viewModelScope.launchOnIo {
+        viewModelScope.launchWithCatchOnIo {
             editProfileUseCase.clearDataBase()
                 .onFailure { error ->
-                    showSnackSuspend(error.message)
+                    showSnack(error.message)
                 }
                 .onSuccess {
-                    showSnackSuspend("Database cleared")
+                    showSnack(R.string.tv_success_db_clear)
                 }
         }
     }
@@ -60,8 +63,9 @@ class AccountViewModel @Inject constructor(
             editProfileUseCase.selfProfile()
                 .distinctUntilChanged()
                 .collectLatest { profile ->
-                    setStateSuspend(AccountUiViewState.SelfProfileViewState(profile))
+                    updateUiState(AccountUiState.SelfProfileUiState(profile))
                 }
         }
     }
+
 }

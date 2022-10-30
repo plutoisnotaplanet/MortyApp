@@ -13,47 +13,38 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
 import com.plutoisnotaplanet.mortyapp.R
-import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseUiViewState
-import com.plutoisnotaplanet.mortyapp.ui.common.base.loadSnackBar
-import com.plutoisnotaplanet.mortyapp.ui.main.MainAction
-import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
-import kotlinx.coroutines.*
+import com.plutoisnotaplanet.mortyapp.application.extensions.prepareSnackBars
+import com.plutoisnotaplanet.mortyapp.ui.main.MainEvent
 
-@Immutable
-sealed class LaunchViewState: BaseUiViewState() {
-    object LoggedIn: LaunchViewState()
-    object LoggedOut: LaunchViewState()
-    object LoginInputs: LaunchViewState()
-    object RegistrationInputs: LaunchViewState()
-    object ForgotPasswordInput: LaunchViewState()
-}
 
 @Composable
 fun WelcomeScreen(
     modifier: Modifier = Modifier,
     viewModel: WelcomeViewModel = hiltViewModel(),
     navHostController: NavHostController,
-    onMainAction: (MainAction) -> Unit,
+    onMainEvent: (MainEvent) -> Unit,
     isLoggedIn: () -> Boolean
 ) {
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.singleAction.prepareSnackBars(onMainEvent)
+    }
+
     val uiState by viewModel.uiState
-    uiState.loadSnackBar(onMainAction)
 
     val welcomeTransition = updateTransition(targetState = uiState, label = null)
 
     BackHandler {
         when (uiState) {
-            LaunchViewState.LoginInputs, LaunchViewState.RegistrationInputs -> {
-                viewModel.updateUiState(LaunchViewState.LoggedOut)
+            WelcomeUiState.LoginInputs, WelcomeUiState.RegistrationInputs -> {
+                viewModel.updateUiState(WelcomeUiState.LoggedOut)
             }
-            LaunchViewState.LoggedOut -> {
-                viewModel.updateUiState(BaseUiViewState.Initialize)
+            WelcomeUiState.LoggedOut -> {
+                viewModel.updateUiState(WelcomeUiState.Initialize)
             }
-            LaunchViewState.ForgotPasswordInput -> {
-                viewModel.updateUiState(LaunchViewState.LoginInputs)
+            WelcomeUiState.ForgotPasswordInput -> {
+                viewModel.updateUiState(WelcomeUiState.LoginInputs)
             }
             else -> {}
         }
@@ -63,7 +54,7 @@ fun WelcomeScreen(
         label = "bgColor",
         targetValueByState = { state ->
             when (state) {
-                LaunchViewState.LoggedIn -> colorResource(id = R.color.colorAccent)
+                WelcomeUiState.LoggedIn -> colorResource(id = R.color.colorAccent)
                 else -> colorResource(id = R.color.white)
             }
         })
@@ -79,10 +70,10 @@ fun WelcomeScreen(
                     MutableInteractionSource()
                 }
             ) {
-                if (uiState == BaseUiViewState.Initialize) {
+                if (uiState == WelcomeUiState.Initialize) {
                     when (isLoggedIn()) {
-                        true -> viewModel.updateUiState(LaunchViewState.LoggedIn)
-                        false -> viewModel.updateUiState(LaunchViewState.LoggedOut)
+                        true -> viewModel.updateUiState(WelcomeUiState.LoggedIn)
+                        false -> viewModel.updateUiState(WelcomeUiState.LoggedOut)
                     }
                 }
             },
@@ -91,34 +82,22 @@ fun WelcomeScreen(
         WelcomeLabel(welcomeTransition = welcomeTransition, navHostController = navHostController)
 
         when (uiState) {
-            LaunchViewState.LoggedOut -> {
+            WelcomeUiState.LoggedOut -> {
                 WelcomeButtons(
                     welcomeTransition = welcomeTransition,
                     launchState = uiState,
                     updateUiState = viewModel::updateUiState
                 )
             }
-            LaunchViewState.LoginInputs, LaunchViewState.RegistrationInputs, LaunchViewState.ForgotPasswordInput -> {
+            WelcomeUiState.LoginInputs, WelcomeUiState.RegistrationInputs, WelcomeUiState.ForgotPasswordInput -> {
                 WelcomeInputs(
                     viewModel = viewModel,
                     welcomeTransition = welcomeTransition,
                     launchState = uiState,
-                    forgotPasswordClick = { viewModel.updateUiState(LaunchViewState.ForgotPasswordInput) }
+                    forgotPasswordClick = { viewModel.updateUiState(WelcomeUiState.ForgotPasswordInput) }
                 )
             }
             else -> {}
         }
-    }
-}
-
-
-fun navigateToHomeScope(navHostController: NavHostController, coroutineScope: CoroutineScope) {
-    coroutineScope.launch {
-        navHostController.navigate(
-            route = NavScreen.NavHomeScope.route,
-            navOptions = NavOptions.Builder().setPopUpTo(
-                route = NavScreen.Splash.route, inclusive = true
-            ).build()
-        )
     }
 }

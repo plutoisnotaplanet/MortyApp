@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CharactersUseCase {
 
-    fun getCharacters(
+    suspend fun getCharacters(
         pageId: Int,
         filterModel: CharactersFilterModel? = null
     ): Flow<Response<List<Character>>>

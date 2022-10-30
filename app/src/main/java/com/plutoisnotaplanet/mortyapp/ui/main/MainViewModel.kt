@@ -3,19 +3,13 @@ package com.plutoisnotaplanet.mortyapp.ui.main
 import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import com.plutoisnotaplanet.mortyapp.R
-import com.plutoisnotaplanet.mortyapp.application.domain.model.UserProfile
 import com.plutoisnotaplanet.mortyapp.application.domain.model.onFailure
 import com.plutoisnotaplanet.mortyapp.application.domain.model.onSuccess
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.EditProfileUseCase
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.LaunchUseCase
-import com.plutoisnotaplanet.mortyapp.application.extensions.Extensions.launchOnIo
-import com.plutoisnotaplanet.mortyapp.ui.common.SingleLiveEvent
-import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseUiViewState
 import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -27,41 +21,42 @@ class MainViewModel @Inject constructor(
     private val editProfileUseCase: EditProfileUseCase,
     private val launchUseCase: LaunchUseCase,
     val imageLoader: ImageLoader,
-) : BaseViewModel() {
+) : BaseViewModel<MainUiState>() {
 
-    val selfProfile: MutableState<UserProfile> = mutableStateOf(UserProfile(""))
+    override val _uiState: MutableState<MainUiState> = mutableStateOf(MainUiState.Initialize)
 
-    val mainActionEvent: SingleLiveEvent<MainSingleEvent> = SingleLiveEvent()
-
-
-    val isLogged: Boolean
-        get() = launchUseCase.isLogged
+    fun isLogged(): Boolean {
+        return launchUseCase.isLogged
+    }
 
     fun logout() {
         launchUseCase.logout()
     }
 
-    fun handleAction(action: MainAction) {
-        Timber.e("$action")
-        when(action) {
-            is MainAction.OpenCamera -> getInputUriForPhoto()
-            is MainAction.OpenGalleryChooser -> {
-                mainActionEvent.postValue(MainSingleEvent.OpenGalleryChooser)
+    fun obtainEvent(event: MainEvent) {
+        Timber.e("$event")
+        when(event) {
+            is MainEvent.OpenCamera -> getInputUriForPhoto()
+            is MainEvent.OpenGalleryChooser -> {
+                setAction(MainAction.OpenGalleryChooser)
             }
-            is MainAction.ShowStringSnack -> {
-                showSnack(action.message)
+            is MainEvent.ShowResourceSnack -> {
+                showSnack(event.message)
             }
-            is MainAction.ShowResourceSnack -> {
-                showSnack(action.message)
+            is MainEvent.ShowStringSnack -> {
+                showSnack(event.message)
+            }
+            is MainEvent.OpenDrawerMenu -> {
+                setAction(MainAction.OpenDrawerMenu)
             }
         }
     }
 
     private fun getInputUriForPhoto() {
-        viewModelScope.launchOnIo {
+        viewModelScope.launchWithCatchOnIo {
             editProfileUseCase.getInputUriForPhoto()
                 .onSuccess { uri ->
-                    mainActionEvent.postValue(MainSingleEvent.OpenCamera(uri))
+                    setAction(MainAction.OpenCamera(uri))
                 }
                 .onFailure { error ->
                     showSnack(error.message)
@@ -70,7 +65,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun savePhotoByUri(uri: Uri) {
-        viewModelScope.launchOnIo {
+        viewModelScope.launchWithCatchOnIo {
             editProfileUseCase.savePhotoByUri(uri)
                 .onSuccess {
                     showSnack(R.string.tv_photo_was_successfully_saved)
@@ -85,8 +80,10 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             editProfileUseCase.selfProfile()
                 .collect { profile ->
-                    selfProfile.value = profile
+                    updateUiState(MainUiState.SelfProfileUiState(profile))
                 }
         }
     }
+
+
 }

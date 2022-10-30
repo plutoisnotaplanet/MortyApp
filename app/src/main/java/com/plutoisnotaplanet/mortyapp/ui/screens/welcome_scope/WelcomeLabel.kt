@@ -15,14 +15,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.plutoisnotaplanet.mortyapp.R
-import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseUiViewState
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
 
 
 @Composable
 fun WelcomeLabel(
     modifier: Modifier = Modifier,
-    welcomeTransition: Transition<BaseUiViewState>,
+    welcomeTransition: Transition<WelcomeUiState>,
     navHostController: NavHostController
 ) {
 
@@ -39,8 +38,8 @@ fun WelcomeLabel(
         label = "labelYTransition",
         targetValueByState = { state ->
             when (state) {
-                BaseUiViewState.Initialize -> 0
-                LaunchViewState.LoginInputs, LaunchViewState.RegistrationInputs -> -10
+                WelcomeUiState.Initialize -> 0
+                WelcomeUiState.LoginInputs, WelcomeUiState.RegistrationInputs -> -10
                 else -> -20
             }
         })
@@ -54,8 +53,8 @@ fun WelcomeLabel(
         label = "labelSize",
         targetValueByState = { state ->
             when (state) {
-                BaseUiViewState.Initialize -> 1f
-                LaunchViewState.LoginInputs, LaunchViewState.RegistrationInputs -> 0.5f
+                WelcomeUiState.Initialize -> 1f
+                WelcomeUiState.LoginInputs, WelcomeUiState.RegistrationInputs -> 0.5f
                 else -> 0.7f
             }
         })
@@ -65,7 +64,7 @@ fun WelcomeLabel(
         label = "bgSize",
         targetValueByState = { state ->
             when (state) {
-                LaunchViewState.LoggedIn -> 128f
+                WelcomeUiState.LoggedIn -> 128f
                 else -> 1f
             }
         },
@@ -80,7 +79,7 @@ fun WelcomeLabel(
         label = "loggedInLabelRotate",
         targetValueByState = { state ->
             when (state) {
-                LaunchViewState.LoggedIn -> 512f
+                WelcomeUiState.LoggedIn -> 512f
                 else -> 0f
             }
         })
@@ -101,7 +100,7 @@ fun WelcomeLabel(
         )
     }
 
-    if (welcomeTransition.currentState == LaunchViewState.LoggedIn && !isNavigated) {
+    if (welcomeTransition.currentState == WelcomeUiState.LoggedIn && !isNavigated) {
         navHostController.navigate(
             route = NavScreen.NavHomeScope.route,
             navOptions = NavOptions.Builder().setPopUpTo(

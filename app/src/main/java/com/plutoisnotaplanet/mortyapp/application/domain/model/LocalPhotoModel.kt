@@ -7,7 +7,15 @@ data class LocalPhotoModel(
     val photoUri: String? = null,
     val photoPath: String? = null,
     val photoInBase64: String? = null
-)
+) {
+
+    val onlyUri: LocalPhotoModel
+        get() = LocalPhotoModel(
+            photoType = PhotoType.Avatar,
+            photoUri = photoUri
+        )
+
+}
 
 enum class PhotoType {
     Avatar

@@ -1,6 +1,5 @@
-package com.plutoisnotaplanet.mortyapp.ui.theme.compose
+package com.plutoisnotaplanet.mortyapp.ui.components
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,6 +12,11 @@ class SearchState<S> internal constructor(
      * Query [TextFieldValue] that contains text and query selection position.
      */
     var query by mutableStateOf(TextFieldValue())
+
+    /**
+     * TopBarState [TopBarSearchState] menu top bar state.
+     */
+    var topBarState by mutableStateOf(TopBarSearchState.HIDDEN)
 
     /**
      * Flag  Search composable(TextField) focus state.
@@ -30,13 +34,11 @@ class SearchState<S> internal constructor(
      * query texts are same.
      */
     var previousQueryText = ""
-        private set
 
-    var searchDisplay: SearchDisplay = SearchDisplay.Results
+    val searchDisplay: SearchDisplay
         get() = when {
             focused && query.text.isEmpty() -> SearchDisplay.Suggestions
             else -> {
-                previousQueryText = query.text
                 SearchDisplay.Results
             }
         }
@@ -55,4 +57,9 @@ class SearchState<S> internal constructor(
 
 enum class SearchDisplay {
     Suggestions, Results
+}
+
+enum class TopBarSearchState {
+    HIDDEN,
+    SHOWING
 }

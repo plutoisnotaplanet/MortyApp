@@ -2,23 +2,22 @@ package com.plutoisnotaplanet.mortyapp.ui.main
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseUiViewState
+import com.plutoisnotaplanet.mortyapp.application.domain.model.UserProfile
+import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseAction
 import com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account.AccountScreen
 import com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account.SettingsScreen
 import com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.HomeScopeScreen
@@ -28,6 +27,7 @@ import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavigationDrawerItem
 import com.plutoisnotaplanet.mortyapp.ui.theme.compose.utils.SnackbarController
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -37,80 +37,98 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
 
-    val uiEvent by viewModel.uiState
+    val uiState: MainUiState by viewModel.uiState
 
-    val selfProfile by viewModel.selfProfile
+    var selfProfile by remember {
+        mutableStateOf(UserProfile())
+    }
 
-    val navController = rememberNavController()
-    val scaffoldState = rememberScaffoldState()
-    val coroutineScope = rememberCoroutineScope()
-    val snackBarController = SnackbarController(coroutineScope)
-
-    when (uiEvent) {
-        is BaseUiViewState.ShowStringSnack -> {
-            snackBarController.showSnackbar(
-                scaffoldState,
-                (uiEvent as BaseUiViewState.ShowStringSnack).message
-            )
-        }
-        is BaseUiViewState.ShowResourceSnack -> {
-            snackBarController.showSnackbar(
-                scaffoldState,
-                stringResource(id = (uiEvent as BaseUiViewState.ShowResourceSnack).message)
-            )
+    when(uiState) {
+        is MainUiState.SelfProfileUiState -> {
+            selfProfile = (uiState as MainUiState.SelfProfileUiState).selfProfile
         }
         else -> {}
     }
 
-    val isNavigationDrawerEnabled = remember {
-        mutableStateOf(false)
+    val navController = rememberNavController()
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = Unit) {
+        val snackBarController = SnackbarController(this)
+
+        viewModel.singleAction.collectLatest { uiEvent ->
+            Timber.e("mainAction screen $uiEvent")
+            when (uiEvent) {
+                is BaseAction.ShowStringSnack -> {
+                    snackBarController.showSnackbar(
+                        scaffoldState,
+                        uiEvent.message
+                    )
+                }
+                is BaseAction.ShowResourceSnack -> {
+                    snackBarController.showSnackbar(
+                        scaffoldState,
+                        context.getString(uiEvent.message)
+                    )
+                }
+                is MainAction.OpenDrawerMenu -> {
+                    scaffoldState.drawerState.open()
+                }
+                else -> {}
+            }
+        }
     }
 
-    val drawerOffset = scaffoldState.drawerState.offset
-
-    val mainTransition =
-        updateTransition(targetState = drawerOffset.value, label = "mainTransition")
-
-    val scale = 1.0207939f
-
-    val scaleScaffold by mainTransition.animateFloat(
-        transitionSpec = { tween(durationMillis = 10) },
-        label = "scaffoldScale",
-        targetValueByState = { offset ->
-            val current = -offset/1058
-            val diff = (scale - current)
-            val result = scale - diff + 1f
-            Timber.e("result: ${result} scale $scale current $current diff $diff")
-            result
-        }
-    )
-
-    val xEnd = 36f
-
-    val scaffoldXPos by mainTransition.animateFloat(
-        transitionSpec = { tween(durationMillis = 10) },
-        label = "scaffoldXPos",
-        targetValueByState = { offset ->
-            val current = -offset/30
-            xEnd - current
-        }
-    )
-
-    val yEnd = -36f
-
-    val scaffoldYPos by mainTransition.animateFloat(
-        transitionSpec = { tween(durationMillis = 10) },
-        label = "scaffoldYPos",
-        targetValueByState = { offset ->
-            val current = offset/30
-            yEnd - current
-        }
-    )
+    //TODO: add animation on Drawer Opening
+//
+//    val drawerOffset = scaffoldState.drawerState.offset
+//
+//    val mainTransition =
+//        updateTransition(targetState = drawerOffset.value, label = "mainTransition")
+//
+//    val scale = 1.0207939f
+//
+//    val scaleScaffold by mainTransition.animateFloat(
+//        transitionSpec = { tween(durationMillis = 10) },
+//        label = "scaffoldScale",
+//        targetValueByState = { offset ->
+//            val current = -offset / 1058
+//            val diff = (scale - current)
+//            val result = scale - diff + 1f
+////            Timber.e("result: ${result} scale $scale current $current diff $diff")
+//            result
+//        }
+//    )
+//
+//    val xEnd = 36f
+//
+//    val scaffoldXPos by mainTransition.animateFloat(
+//        transitionSpec = { tween(durationMillis = 10) },
+//        label = "scaffoldXPos",
+//        targetValueByState = { offset ->
+//            val current = -offset / 30
+//            xEnd - current
+//        }
+//    )
+//
+//    val yEnd = -36f
+//
+//    val scaffoldYPos by mainTransition.animateFloat(
+//        transitionSpec = { tween(durationMillis = 10) },
+//        label = "scaffoldYPos",
+//        targetValueByState = { offset ->
+//            val current = offset / 30
+//            yEnd - current
+//        }
+//    )
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = scaffoldState.snackbarHostState) },
         scaffoldState = scaffoldState,
-        drawerGesturesEnabled = isNavigationDrawerEnabled.value,
+        drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
         drawerShape = RoundedCornerShape(0.dp),
         drawerContent = {
             DrawerContent(selfProfile) { route ->
@@ -146,10 +164,7 @@ fun MainScreen(
                     .padding(padding),
                 navController = navController,
                 viewModel = viewModel,
-                isNavigationDrawerEnabled = { isEnabled ->
-                    isNavigationDrawerEnabled.value = isEnabled
-                },
-                onMainAction = viewModel::handleAction
+                onMainEvent = viewModel::obtainEvent
             )
         },
         backgroundColor = Color.White // Set background color to avoid the white flashing when you switch between screens
@@ -161,8 +176,7 @@ fun Navigation(
     modifier: Modifier,
     navController: NavHostController,
     viewModel: MainViewModel,
-    isNavigationDrawerEnabled: (Boolean) -> Unit,
-    onMainAction: (MainAction) -> Unit
+    onMainEvent: (MainEvent) -> Unit
 ) {
 
     NavHost(
@@ -177,20 +191,20 @@ fun Navigation(
         ) {
             WelcomeScreen(
                 navHostController = navController,
-                onMainAction = onMainAction
-            ) { viewModel.isLogged }
+                onMainEvent = onMainEvent
+            ) { viewModel.isLogged() }
         }
         composable(
             route = NavScreen.NavHomeScope.route
         ) {
-            HomeScopeScreen(isNavigationDrawerEnabled = isNavigationDrawerEnabled)
+            HomeScopeScreen(onMainEvent = onMainEvent)
         }
 
         composable(
             route = NavScreen.Account.route
         ) {
             AccountScreen { mainAction ->
-                viewModel.handleAction(mainAction)
+                viewModel.obtainEvent(mainAction)
             }
         }
 

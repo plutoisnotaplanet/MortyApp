@@ -39,7 +39,6 @@ fun AccountData(
     modifier: Modifier = Modifier,
     userProfile: UserProfile = UserProfile()
 ) {
-
     AccountEmail(modifier = Modifier.padding(top = 16.dp), email = userProfile.email)
 
     if (userProfile.isNotEmpty) {
@@ -96,6 +95,7 @@ fun AccountEmail(
             .fillMaxWidth(),
         backgroundColor = Color.White
     ) {
+        Timber.e("data compose")
         DefaultTitle(
             value = stringResource(R.string.tt_email_dots),
             modifier = Modifier.padding(start = 12.dp, top = 8.dp)

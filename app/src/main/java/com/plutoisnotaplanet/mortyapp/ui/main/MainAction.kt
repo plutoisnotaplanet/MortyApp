@@ -1,10 +1,11 @@
 package com.plutoisnotaplanet.mortyapp.ui.main
 
+import android.net.Uri
 import androidx.annotation.StringRes
+import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseAction
 
-sealed class MainAction {
-    object OpenCamera : MainAction()
+sealed class MainAction: BaseAction() {
+    data class OpenCamera(val uri: Uri) : MainAction()
     object OpenGalleryChooser: MainAction()
-    data class ShowStringSnack(val message: String) : MainAction()
-    data class ShowResourceSnack(@StringRes val message: Int) : MainAction()
+    object OpenDrawerMenu: MainAction()
 }

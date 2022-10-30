@@ -1,82 +1,79 @@
 package com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.characters
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.plutoisnotaplanet.mortyapp.R
-import com.plutoisnotaplanet.mortyapp.ui.theme.compose.ExtendedScrollingUpButton
-
-@Immutable
-enum class FloatingButtonState {
-    ScrollUp, Filters, None
-}
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CharactersFloatingActionButtons(
-    showFiltersDialog: () -> Unit,
+    lazyListState: LazyListState,
     filterBottomSheetState: ModalBottomSheetState,
-    isScrollUpVisible: Boolean,
+    showFiltersDialog: () -> Unit,
     scrollToTop: () -> Unit
 ) {
 
-    val state = remember {
-        mutableStateOf(FloatingButtonState.Filters)
+    val isScrollUpVisible by remember {
+        derivedStateOf { lazyListState.firstVisibleItemIndex > 0 }
     }
 
-    val isFiltersBtnVisible by derivedStateOf {
-        mutableStateOf(!filterBottomSheetState.isVisible)
+    val isBtnVisible by remember {
+        derivedStateOf {
+            filterBottomSheetState.currentValue == ModalBottomSheetValue.Hidden
+        }
     }
 
-    state.value = when {
-        isFiltersBtnVisible.value && !isScrollUpVisible -> FloatingButtonState.Filters
-        isScrollUpVisible -> FloatingButtonState.ScrollUp
-        else -> FloatingButtonState.None
-    }
-
-    when (state.value) {
-        FloatingButtonState.Filters -> {
-            FloatingActionButton(
-                backgroundColor = colorResource(id = R.color.colorAccent),
-                onClick = {
-                    isFiltersBtnVisible.value = false
+    AnimatedVisibility(
+        visible = isBtnVisible || isScrollUpVisible,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        FloatingActionButton(
+            backgroundColor = colorResource(id = R.color.colorAccent),
+            onClick = {
+                if (isScrollUpVisible) {
+                    scrollToTop()
+                } else {
                     showFiltersDialog()
                 }
+            }
+        ) {
+            Row(
+                modifier = Modifier.padding(start = if (isScrollUpVisible) 12.dp else 0.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Filled.FilterList,
+                    imageVector = if (isScrollUpVisible) Icons.Filled.ArrowUpward else Icons.Filled.FilterList,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
+
+                AnimatedVisibility(visible = isScrollUpVisible) {
+                    Text(
+                        text = "Scroll up",
+                        color = Color.White,
+                        modifier = Modifier.padding(start = 12.dp, end = 12.dp)
+                    )
+                }
             }
         }
-        FloatingButtonState.ScrollUp -> {
-            ExtendedScrollingUpButton(
-                action = scrollToTop
-            )
-        }
-        FloatingButtonState.None -> {}
     }
-
-    //TODO: fix animation bug: Filters button is not visible after closing bottom sheet
-//
-//    AnimatedContent(
-//        targetState = state.value,
-//        transitionSpec = {
-//            fadeIn(animationSpec = tween(120)) +
-//                    scaleIn(initialScale = 0.3f, animationSpec = tween(120)) with
-//                    fadeOut(animationSpec = tween(90))
-//        }) { floatingButtonState ->
-//
-//
-//    }
 }
 
 

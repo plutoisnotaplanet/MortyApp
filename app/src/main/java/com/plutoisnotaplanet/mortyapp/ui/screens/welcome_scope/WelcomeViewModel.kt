@@ -6,8 +6,6 @@ import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.InputState
 import com.plutoisnotaplanet.mortyapp.application.domain.model.Response
 import com.plutoisnotaplanet.mortyapp.application.domain.usecase.AuthUseCase
-import com.plutoisnotaplanet.mortyapp.application.extensions.Extensions.launchOnIo
-import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseUiViewState
 import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -15,7 +13,9 @@ import javax.inject.Inject
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(
     private val authUseCase: AuthUseCase
-) : BaseViewModel() {
+) : BaseViewModel<WelcomeUiState>() {
+
+    override val _uiState: MutableState<WelcomeUiState> = mutableStateOf(WelcomeUiState.Initialize)
 
     var loginInput by mutableStateOf("")
         private set
@@ -44,12 +44,8 @@ class WelcomeViewModel @Inject constructor(
         passwordInput = input
     }
 
-    fun updateUiState(newState: BaseUiViewState) {
-        _uiState.value = newState
-    }
-
     fun resetPassword() {
-        viewModelScope.launchOnIo {
+        viewModelScope.launchWithCatchOnIo {
             authUseCase.resetPassword(loginInput).collect { response ->
                 when (response) {
                     is Response.Error -> showSnack(response.error.message)
@@ -57,7 +53,7 @@ class WelcomeViewModel @Inject constructor(
                         showSnack(R.string.tv_email_restore_password)
                         loginInput = ""
                         passwordInput = ""
-                        updateUiState(LaunchViewState.LoggedOut)
+                        updateUiState(WelcomeUiState.LoggedOut)
                     }
                 }
             }
@@ -65,18 +61,18 @@ class WelcomeViewModel @Inject constructor(
     }
 
     fun signIn() {
-        viewModelScope.launchOnIo {
+        viewModelScope.launchWithCatchOnIo {
             authUseCase.signIn(loginInput, passwordInput).collect { response ->
                 when (response) {
                     is Response.Error -> showSnack(response.error.message)
-                    else -> updateUiState(LaunchViewState.LoggedIn)
+                    else -> updateUiState(WelcomeUiState.LoggedIn)
                 }
             }
         }
     }
 
     fun signUp() {
-        viewModelScope.launchOnIo {
+        viewModelScope.launchWithCatchOnIo {
             authUseCase.signUp(loginInput, passwordInput).collect { response ->
                 when (response) {
                     is Response.Error -> showSnack(response.error.message)
@@ -84,10 +80,11 @@ class WelcomeViewModel @Inject constructor(
                         showSnack(R.string.tv_success_sign_up)
                         loginInput = ""
                         passwordInput = ""
-                        updateUiState(LaunchViewState.LoggedOut)
+                        updateUiState(WelcomeUiState.LoggedOut)
                     }
                 }
             }
         }
     }
+
 }

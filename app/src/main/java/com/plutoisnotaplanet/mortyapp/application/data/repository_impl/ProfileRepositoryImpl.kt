@@ -39,13 +39,13 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun getSelfProfile(): Flow<UserProfile> {
         return if (dataBase.userProfileDao.hasProfile(preferences.email)) {
-            dataBase.userProfileDao.getProfileByEmailFlow(preferences.email).map { it.toModel() }
+            dataBase.userProfileDao.getProfileByEmailFlow(preferences.email).map { it.toScreenModel() }
         } else {
             dataBase.userProfileDao.insert(
                 UserProfileEntity(
                     email = preferences.email
                 ))
-            dataBase.userProfileDao.getProfileByEmailFlow(preferences.email).map { it.toModel() }
+            dataBase.userProfileDao.getProfileByEmailFlow(preferences.email).map { it.toScreenModel() }
         }
     }
 

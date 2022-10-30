@@ -2,69 +2,62 @@ package com.plutoisnotaplanet.mortyapp.ui.common.base
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import timber.log.Timber
 
-abstract class BaseViewModel : ViewModel() {
+abstract class BaseViewModel<T>: ViewModel() {
 
-    private val mutex = Mutex()
+    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        Timber.e(throwable.message)
+    }
 
-    protected val _uiState: MutableState<BaseUiViewState> =
-        mutableStateOf(BaseUiViewState.Initialize)
+    protected fun CoroutineScope.launchWithCatchOnIo(block: suspend CoroutineScope.() -> Unit) =
+        launch(exceptionHandler + Dispatchers.IO) {
+            block()
+        }
 
-    val uiState: State<BaseUiViewState> by lazy {
-        _uiState
+    private val _singleAction: MutableSharedFlow<BaseAction> = MutableSharedFlow(
+        replay = 1,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
+    val singleAction: SharedFlow<BaseAction> = _singleAction.asSharedFlow()
+
+    protected abstract val _uiState: MutableState<T>
+    val uiState: State<T> by lazy { _uiState }
+
+    fun updateUiState(newState: T) {
+        _uiState.value = newState
+    }
+
+    fun setAction(action: BaseAction) {
+        viewModelScope.launch {
+            _singleAction.emit(action)
+        }
     }
 
     fun showSnack(message: Int) {
         viewModelScope.launch {
-            _uiState.value = BaseUiViewState.ShowResourceSnack(message)
-            delay(100)
-            _uiState.value = BaseUiViewState.Initialize
+            _singleAction.emit(BaseAction.ShowResourceSnack(message))
         }
     }
 
     fun showSnack(message: String?) {
         if (message != null) {
             viewModelScope.launch {
-                _uiState.value = BaseUiViewState.ShowStringSnack(message)
-                delay(100)
-                _uiState.value = BaseUiViewState.Initialize
+                _singleAction.emit(BaseAction.ShowStringSnack(message))
             }
         }
     }
 
-    suspend fun showSnackSuspend(message: String?) {
-        if (message != null) {
-            mutex.withLock {
-                _uiState.value = BaseUiViewState.ShowStringSnack(message)
-                delay(100)
-                _uiState.value = BaseUiViewState.Initialize
-            }
-        }
-    }
 
-    suspend fun showSnackSuspend(message: Int) {
-        mutex.withLock {
-            _uiState.value = BaseUiViewState.ShowResourceSnack(message)
-            delay(100)
-            _uiState.value = BaseUiViewState.Initialize
-        }
-    }
-
-    suspend fun CoroutineScope.setStateSuspend(state: BaseUiViewState) {
-        mutex.withLock { _uiState.value = state }
-    }
-
-    fun setState(state: BaseUiViewState) {
-        _uiState.value = state
-    }
 
 }
 
