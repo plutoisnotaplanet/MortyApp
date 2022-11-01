@@ -1,5 +1,6 @@
 package com.plutoisnotaplanet.mortyapp.ui.main
 
+import android.os.Bundle
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,19 +14,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
+import androidx.navigation.NavController.OnDestinationChangedListener
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.plutoisnotaplanet.mortyapp.application.domain.model.UserProfile
 import com.plutoisnotaplanet.mortyapp.ui.common.base.BaseAction
-import com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account.AccountScreen
+import com.plutoisnotaplanet.mortyapp.ui.screens.welcome_scope.drawer_scope.account.AccountScreen
 import com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account.SettingsScreen
 import com.plutoisnotaplanet.mortyapp.ui.screens.home_scope.HomeScopeScreen
 import com.plutoisnotaplanet.mortyapp.ui.screens.welcome_scope.WelcomeScreen
 import com.plutoisnotaplanet.mortyapp.ui.navigation.DrawerContent
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavigationDrawerItem
-import com.plutoisnotaplanet.mortyapp.ui.theme.compose.utils.SnackbarController
+import com.plutoisnotaplanet.mortyapp.ui.common.SnackbarController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -37,7 +39,7 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
 
-    val uiState: MainUiState by viewModel.uiState
+    val uiState by viewModel.uiState
 
     var selfProfile by remember {
         mutableStateOf(UserProfile())
@@ -60,7 +62,6 @@ fun MainScreen(
         val snackBarController = SnackbarController(this)
 
         viewModel.singleAction.collectLatest { uiEvent ->
-            Timber.e("mainAction screen $uiEvent")
             when (uiEvent) {
                 is BaseAction.ShowStringSnack -> {
                     snackBarController.showSnackbar(
@@ -191,21 +192,21 @@ fun Navigation(
         ) {
             WelcomeScreen(
                 navHostController = navController,
-                onMainEvent = onMainEvent
-            ) { viewModel.isLogged() }
+                onMainEvent = onMainEvent,
+                isLoggedIn = { viewModel.isLogged() }
+            )
         }
         composable(
             route = NavScreen.NavHomeScope.route
         ) {
             HomeScopeScreen(onMainEvent = onMainEvent)
+            viewModel.loadDrawerProfile()
         }
 
         composable(
             route = NavScreen.Account.route
         ) {
-            AccountScreen { mainAction ->
-                viewModel.obtainEvent(mainAction)
-            }
+            AccountScreen(onMainEvent = onMainEvent)
         }
 
         composable(

@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.ui.components.AnimatedButton
 import com.plutoisnotaplanet.mortyapp.ui.navigation.NavScreen
 
@@ -51,15 +53,15 @@ fun WelcomeButtons(
     Column(modifier = Modifier.fillMaxSize()) {
 
         AnimatedButton(
-            text = NavScreen.Login.route,
+            text = stringResource(R.string.tv_sign_in),
             onClick = { updateUiState(WelcomeUiState.LoginInputs) },
             modifier = modifier
-                .padding(bottom = 4.dp)
+                .padding(bottom = 16.dp)
                 .absoluteOffset(x = loginBtnPos.dp)
         )
 
         AnimatedButton(
-            text = NavScreen.Registration.route,
+            text = stringResource(R.string.tv_sign_up),
             onClick = { updateUiState(WelcomeUiState.RegistrationInputs) },
             modifier = modifier.absoluteOffset(x = regBtnPos.dp)
         )

@@ -1,11 +1,9 @@
-package com.plutoisnotaplanet.mortyapp.ui.theme.compose.utils
+package com.plutoisnotaplanet.mortyapp.ui.common
 
 import androidx.compose.material.ScaffoldState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.lang.ref.WeakReference
 
 class SnackbarController
 constructor(
@@ -25,7 +23,6 @@ constructor(
         message: String,
         actionLabel: String = ""
     ){
-        Timber.e("scsc $message")
         if (message.isNotBlank()) {
             if(snackbarJob == null){
                 snackbarJob = scope.launch {

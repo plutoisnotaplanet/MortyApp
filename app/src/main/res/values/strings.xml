@@ -16,10 +16,14 @@
     <string name="tt_result_not_found">Result not found</string>
 
     <string name="tv_password_is_invalid">Password is not valid by rules:
-     <br>-length between 8-16,</br>
-        <br>-at least one number,</br>
-        <br>-at least one letter,</br>
-        <br>-at least one character</br>
+        \n
+     -length between 8-16,
+        \n
+        -at least one number,
+        \n
+        -at least one letter,
+        \n
+        -at least one character
     </string>
     <string name="tv_password_is_too_long">Password is too long</string>
     <string name="tv_password_is_too_short">Password is too short</string>
@@ -53,5 +57,7 @@
     <string name="tv_data_with_slash">%1s/%2s</string>
     <string name="tv_clear_database_description">Are you sure you want to clear the database?</string>
     <string name="tt_clear_database">Clear database</string>
-    <string name="tv_success_db_clear">Database successfully cleared</string>
+    <string name="tv_success_db_clear">Database was successfully cleared</string>
+    <string name="tv_sign_in">Sign in</string>
+    <string name="tv_sign_up">Sign Up</string>
 </resources>

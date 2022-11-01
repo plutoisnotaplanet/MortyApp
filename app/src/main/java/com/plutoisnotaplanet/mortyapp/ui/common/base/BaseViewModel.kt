@@ -2,6 +2,7 @@ package com.plutoisnotaplanet.mortyapp.ui.common.base
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
@@ -11,14 +12,14 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import timber.log.Timber
 
-abstract class BaseViewModel<T>: ViewModel() {
+abstract class BaseViewModel<T: UiState>: ViewModel() {
 
     private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         Timber.e(throwable.message)
     }
 
     protected fun CoroutineScope.launchWithCatchOnIo(block: suspend CoroutineScope.() -> Unit) =
-        launch(exceptionHandler + Dispatchers.IO) {
+        launch(SupervisorJob() + exceptionHandler + Dispatchers.IO) {
             block()
         }
 

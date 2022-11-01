@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account
+package com.plutoisnotaplanet.mortyapp.ui.screens.welcome_scope.drawer_scope.account
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -21,11 +21,11 @@ class AccountViewModel @Inject constructor(
     private val editProfileUseCase: EditProfileUseCase
 ) : BaseViewModel<AccountUiState>() {
 
+    override val _uiState: MutableState<AccountUiState> = mutableStateOf(AccountUiState.Initialize)
+
     companion object {
         val bottomMenuList = BottomMenuAction.values().toList()
     }
-
-    override val _uiState: MutableState<AccountUiState> = mutableStateOf(AccountUiState.Initialize)
 
     inline val menuActionsList: (Boolean) -> List<BottomMenuAction>
         get() = { hasAvatar ->

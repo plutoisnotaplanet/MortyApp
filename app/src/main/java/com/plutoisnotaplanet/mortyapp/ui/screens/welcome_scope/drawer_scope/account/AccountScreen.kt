@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account
+package com.plutoisnotaplanet.mortyapp.ui.screens.welcome_scope.drawer_scope.account
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,7 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.domain.model.BottomMenuAction
 import com.plutoisnotaplanet.mortyapp.application.domain.model.UserProfile
-import com.plutoisnotaplanet.mortyapp.ui.common.base.prepareSnackBars
+import com.plutoisnotaplanet.mortyapp.application.extensions.prepareSnackBars
 import com.plutoisnotaplanet.mortyapp.ui.components.AnimatedButton
 import com.plutoisnotaplanet.mortyapp.ui.components.BottomMenuScreen
 import com.plutoisnotaplanet.mortyapp.ui.main.MainEvent

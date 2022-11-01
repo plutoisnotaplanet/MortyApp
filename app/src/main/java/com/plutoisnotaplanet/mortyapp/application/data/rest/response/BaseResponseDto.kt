@@ -10,7 +10,7 @@ data class BaseResponseDto<T>(
     val results: List<T>
 ) {
 
-    fun <M>toModel(list: List<M>): BaseResponse<M> {
+    fun <M> toModel(list: List<M>): BaseResponse<M> {
         return BaseResponse(
             pagingInfo = pagingInfo?.toModel(),
             results = list

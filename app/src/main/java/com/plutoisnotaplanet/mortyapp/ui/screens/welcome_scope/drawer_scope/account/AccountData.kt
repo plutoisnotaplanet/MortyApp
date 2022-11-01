@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account
+package com.plutoisnotaplanet.mortyapp.ui.screens.welcome_scope.drawer_scope.account
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -20,7 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.plutoisnotaplanet.mortyapp.R
 import com.plutoisnotaplanet.mortyapp.application.Constants
@@ -30,7 +28,6 @@ import com.plutoisnotaplanet.mortyapp.application.utils.compose.DefaultTitle
 import com.plutoisnotaplanet.mortyapp.ui.components.BorderColumn
 import com.plutoisnotaplanet.mortyapp.ui.components.DataField
 import com.plutoisnotaplanet.mortyapp.ui.components.DefaultImage
-import com.plutoisnotaplanet.mortyapp.ui.theme.light_surface
 import timber.log.Timber
 
 @Preview

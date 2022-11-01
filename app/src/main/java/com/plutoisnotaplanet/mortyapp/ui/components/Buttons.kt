@@ -5,6 +5,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActionScope
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -66,16 +68,16 @@ fun AnimatedButton(
 ) {
     Button(
         onClick = onClick,
-        enabled = enabled,
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = backgroundColor
         ),
         contentPadding = PaddingValues(12.dp),
+        enabled = enabled,
         modifier = modifier
             .padding(horizontal = 12.dp)
             .fillMaxWidth()
-            .pushedAnimation(onClick = onClick)
+            .pushedAnimation(onClick = onClick, enabled = enabled)
     ) {
         Timber.e("animated button compose $text")
         Text(

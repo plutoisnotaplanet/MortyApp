@@ -1,6 +1,8 @@
 package com.plutoisnotaplanet.mortyapp.ui.screens.welcome_scope
 
+import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -35,6 +37,9 @@ fun WelcomeScreen(
 
     val welcomeTransition = updateTransition(targetState = uiState, label = null)
 
+    val dispatcher: OnBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current!!.onBackPressedDispatcher
+
     BackHandler {
         when (uiState) {
             WelcomeUiState.LoginInputs, WelcomeUiState.RegistrationInputs -> {
@@ -46,8 +51,9 @@ fun WelcomeScreen(
             WelcomeUiState.ForgotPasswordInput -> {
                 viewModel.updateUiState(WelcomeUiState.LoginInputs)
             }
-            else -> {}
+            else -> dispatcher.onBackPressed()
         }
+        viewModel.clearInputs()
     }
 
     val bgColor by welcomeTransition.animateColor(transitionSpec = { tween(1500) },
@@ -66,17 +72,16 @@ fun WelcomeScreen(
             .padding(horizontal = 12.dp)
             .clickable(
                 indication = null,
-                interactionSource = remember {
-                    MutableInteractionSource()
-                }
-            ) {
-                if (uiState == WelcomeUiState.Initialize) {
-                    when (isLoggedIn()) {
-                        true -> viewModel.updateUiState(WelcomeUiState.LoggedIn)
-                        false -> viewModel.updateUiState(WelcomeUiState.LoggedOut)
+                interactionSource = MutableInteractionSource(),
+                onClick = {
+                    if (uiState == WelcomeUiState.Initialize) {
+                        when (isLoggedIn()) {
+                            true -> viewModel.updateUiState(WelcomeUiState.LoggedIn)
+                            false -> viewModel.updateUiState(WelcomeUiState.LoggedOut)
+                        }
                     }
                 }
-            },
+            ),
     ) {
 
         WelcomeLabel(welcomeTransition = welcomeTransition, navHostController = navHostController)

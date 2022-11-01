@@ -17,11 +17,12 @@ import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun Modifier.pushedAnimation(
-    onClick: (() -> Unit)? = null
-): Modifier = composed {
+    enabled: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    ): Modifier = composed {
 
     val touched = remember { mutableStateOf(false) }
-    val scale = animateFloatAsState(if (touched.value) 0.95f else 1f)
+    val scale = animateFloatAsState(if (touched.value && enabled) 0.95f else 1f)
 
     this
         .scale(scale.value)
@@ -32,7 +33,9 @@ fun Modifier.pushedAnimation(
                 }
                 MotionEvent.ACTION_UP -> {
                     touched.value = false
-                    onClick?.invoke()
+                    if (enabled && onClick != null) {
+                        onClick()
+                    }
                 }
                 MotionEvent.ACTION_CANCEL -> {
                     touched.value = false

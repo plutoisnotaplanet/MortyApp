@@ -3,10 +3,10 @@ package com.plutoisnotaplanet.mortyapp.application.utils.compose
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -32,6 +33,7 @@ fun DefaultInputField(
     label: String = stringResource(id = R.string.tv_unknown),
     value: String = "",
     onValueChange: (String) -> Unit = {},
+    onNextAction: () -> Unit = {},
     inputState: InputState = InputState.Initialize
 ) {
     val isError = inputState is InputState.Error
@@ -46,11 +48,13 @@ fun DefaultInputField(
             modifier = Modifier.fillMaxWidth(),
             value = value,
             singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = { if (inputState is InputState.Valid) onNextAction() }),
             trailingIcon = {
                 if (isError)
                     Icon(
                         imageVector = Icons.Filled.Error,
-                        "error",
+                        contentDescription = null,
                         tint = MaterialTheme.colors.error
                     )
             },
@@ -82,6 +86,7 @@ fun PasswordInputField(
     label: String = stringResource(id = R.string.tv_unknown),
     value: String = "",
     onValueChange: (String) -> Unit = {},
+    onDoneAction: () -> Unit = {},
     inputState: InputState = InputState.Initialize
 ) {
     val isError = inputState is InputState.Error
@@ -100,7 +105,8 @@ fun PasswordInputField(
             value = value,
             singleLine = true,
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { if (inputState is InputState.Valid)  onDoneAction() }),
             trailingIcon = {
                 val image = if (isPasswordVisible)
                     Icons.Filled.Visibility

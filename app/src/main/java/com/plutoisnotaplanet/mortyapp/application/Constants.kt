@@ -8,6 +8,10 @@ object Constants {
 
     const val APP_ID = "MortyApp"
 
+    object Date {
+        const val DATE_FORMAT = "dd/MM/yyyy"
+    }
+
     object DataConstants {
         const val ALL_CHARACTERS = 846
         const val ALL_LOCATIONS = 108

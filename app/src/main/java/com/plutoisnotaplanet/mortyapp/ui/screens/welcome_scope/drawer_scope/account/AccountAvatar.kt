@@ -1,4 +1,4 @@
-package com.plutoisnotaplanet.mortyapp.ui.screens.drawer_scope.account
+package com.plutoisnotaplanet.mortyapp.ui.screens.welcome_scope.drawer_scope.account
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
